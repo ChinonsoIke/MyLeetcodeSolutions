@@ -7,9 +7,69 @@ namespace ConsoleApp1
 {
     internal class Program
     {
+        public class TreeNode
+        {
+             public int val;
+             public TreeNode left;
+             public TreeNode right;
+             public TreeNode(int val = 0, TreeNode left = null, TreeNode right = null)
+                {
+                    this.left = left;
+                    this.right = right;
+                    this.val = val;
+                }
+        }
+
         static void Main(string[] args)
         {
-            Console.WriteLine(PartitionLabels("ababcbacadefegdehijhklij"));
+            var node1 = new TreeNode(3);
+            var node2 = new TreeNode(9);
+            var node3 = new TreeNode(20);
+            var node4 = new TreeNode(15);
+            var node5 = new TreeNode(7);
+
+            node1.left = node2;
+            node1.right = node3;
+            node3.left = node4;
+            node3.right = node5;
+
+            LevelOrder(node1);
+        }
+
+        // https://leetcode.com/problems/binary-tree-level-order-traversal/description/?envType=problem-list-v2&envId=binary-tree
+        // medium
+        public static IList<IList<int>> LevelOrder(TreeNode root)
+        {
+            var res = new List<IList<int>>();
+            if (root == null) return res;
+
+            int level = 1;
+            var list = new List<int>();
+            var q = new Queue<(TreeNode n, int l)>();
+            q.Enqueue((root, 1));
+
+            while (q.Count > 0)
+            {
+                var cur = q.Dequeue();
+                if (list.Count == 0) list.Add(cur.n.val);
+                else
+                {
+                    if (cur.l != level)
+                    {
+                        res.Add(new List<int>(list));
+                        list.Clear();
+                        list.Add(cur.n.val);
+                        level++;
+                    }
+                    else list.Add(cur.n.val);
+                }
+
+                if (cur.n.left != null) q.Enqueue((cur.n.left, cur.l + 1));
+                if (cur.n.right != null) q.Enqueue((cur.n.right, cur.l + 1));
+            }
+
+            res.Add(new List<int>(list));
+            return res;
         }
 
         public static IList<int> PartitionLabels(string s)
