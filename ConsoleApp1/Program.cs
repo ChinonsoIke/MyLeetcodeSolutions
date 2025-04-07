@@ -22,22 +22,126 @@ namespace ConsoleApp1
 
         static void Main(string[] args)
         {
-            var node1 = new TreeNode(3);
-            var node2 = new TreeNode(9);
-            var node3 = new TreeNode(20);
-            var node4 = new TreeNode(15);
-            var node5 = new TreeNode(7);
+            Console.WriteLine(timeInWords(7, 29));
+        }
 
-            node1.left = node2;
-            node1.right = node3;
-            node3.left = node4;
-            node3.right = node5;
+        // https://www.hackerrank.com/challenges/the-time-in-words/problem
+        public static string timeInWords(int h, int m)
+        {
+            var dict = new Dictionary<int, string>(){
+              {1,"one"},
+              {2,"two"},
+              {3,"three"},
+              {4,"four"},
+              {5,"five"},
+              {6,"six"},
+              {7,"seven"},
+              {8,"eight"},
+              {9,"nine"},
+              {10,"ten"},
+              {11,"eleven"},
+              {12,"twelve"},
+              {13,"thirteen"},
+              {14,"fourteen"},
+              {15,"fifteen"},
+              {16,"sixteen"},
+              {17,"seventeen"},
+              {18,"eighteen"},
+              {19,"nineteen"}
+            };
 
-            LevelOrder(node1);
+            if (m == 0) return $"{dict[h]} o' clock";
+            if (m == 15) return $"quarter past {dict[h]}";
+            if (m < 30)
+            {
+                if (m < 20) return $"{dict[m]} minutes past {dict[h]}";
+                var s = m.ToString();
+                return $"twenty {(m == 20 ? "" : dict[int.Parse(s[s.Length - 1].ToString())])} minutes past {dict[h]}";
+            }
+            if (m == 30) return $"half past {dict[h]}";
+            if (m == 45) return $"quarter to {dict[h]}";
+
+            // m > 30
+            m = 60 - m;
+            if (m < 20) return $"{dict[m]} minutes to {dict[h + 1]}";
+            var str = m.ToString();
+            return $"twenty {(m == 20 ? "" : dict[int.Parse(str[str.Length - 1].ToString())])} minutes to {dict[h + 1]}";
+        }
+
+        public static List<int> climbingLeaderboard(List<int> ranked, List<int> player)
+        {
+            var list = new List<int>();
+            int count = 1, prev = ranked[0], i = player.Count - 1;
+
+            foreach (int num in ranked)
+            {
+                if (num < prev)
+                {
+                    count++;
+                }
+                if (player[i] >= num)
+                {
+                    i--;
+                    list.Insert(0, count);
+                }
+            }
+
+            return list;
+        }
+
+        // https://leetcode.com/problems/path-sum-ii/description/?envType=problem-list-v2&envId=binary-tree
+        public static IList<IList<int>> PathSum(TreeNode root, int targetSum)
+        {
+            var stack = new Stack<TreeNode>();
+            var res = new List<IList<int>>();
+            var visited = new Dictionary<TreeNode, bool>();
+
+            if (root == null) return res;
+            stack.Push(root);
+            visited.Add(root, true);
+            int sum = root.val;
+
+            while (stack.Count > 0)
+            {
+                var cur = stack.Peek();
+                if (cur.left != null && !visited.ContainsKey(cur.left))
+                {
+                    stack.Push(cur.left);
+                    visited.Add(cur.left, true);
+                    sum += cur.left.val;
+                    continue;
+                }
+                if (cur.right != null && !visited.ContainsKey(cur.right))
+                {
+                    stack.Push(cur.right);
+                    visited.Add(cur.right, true);
+                    sum += cur.right.val;
+                    continue;
+                }
+
+                if (cur.left == null && cur.right == null)
+                {
+                    if (sum == targetSum)
+                    {
+                        var list = stack.ToList();
+                        var list2 = new List<int>();
+                        for (int i = list.Count - 1; i >= 0; i--)
+                        {
+                            list2.Add(list[i].val);
+                        }
+
+                        res.Add(list2);
+                    }
+                }
+
+                sum -= cur.val;
+                stack.Pop();
+            }
+
+            return res;
         }
 
         // https://leetcode.com/problems/binary-tree-level-order-traversal/description/?envType=problem-list-v2&envId=binary-tree
-        // medium
         public static IList<IList<int>> LevelOrder(TreeNode root)
         {
             var res = new List<IList<int>>();
