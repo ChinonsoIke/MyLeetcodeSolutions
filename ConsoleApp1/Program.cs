@@ -25,6 +25,39 @@ namespace ConsoleApp1
             Console.WriteLine(timeInWords(7, 29));
         }
 
+        // https://www.hackerrank.com/challenges/birthday-cake-candles/problem
+        public static int birthdayCakeCandles(List<int> candles)
+        {
+            var dict = new Dictionary<int, int>();
+            int max = candles[0];
+
+            foreach (int num in candles)
+            {
+                if (dict.ContainsKey(num)) dict[num]++;
+                else dict.Add(num, 1);
+                if (num > max) max = num;
+            }
+
+            return dict[max];
+        }
+
+        // https://www.hackerrank.com/challenges/apple-and-orange/problem
+        public static void countApplesAndOranges(int s, int t, int a, int b, List<int> apples, List<int> oranges)
+        {
+            int x = 0, y = 0;
+            foreach (int num in apples)
+            {
+                if (a + num >= s && a + num <= t) x++;
+            }
+            foreach (int num in oranges)
+            {
+                if (b + num <= t && b + num >= s) y++;
+            }
+
+            Console.WriteLine(x);
+            Console.WriteLine(y);
+        }
+
         // https://www.hackerrank.com/challenges/the-time-in-words/problem
         public static string timeInWords(int h, int m)
         {
