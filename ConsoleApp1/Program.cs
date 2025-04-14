@@ -22,7 +22,29 @@ namespace ConsoleApp1
 
         static void Main(string[] args)
         {
-            Console.WriteLine(timeInWords(7, 29));
+            Console.WriteLine(encryption("feedthedog"));
+        }
+
+        // https://www.hackerrank.com/challenges/encryption/problem?isFullScreen=true
+        public static string encryption(string s)
+        {
+            int floor = (int)Math.Floor(Math.Pow(s.Length, 0.5)), ceil = (int)Math.Ceiling(Math.Pow(s.Length, 0.5));
+
+            while (floor * ceil < s.Length) floor++;
+
+            string[] enc = new string[ceil];
+            int sIndex = 0;
+            for (int i = 0; i < floor; i++)
+            {
+                for (int j = 0; j < ceil; j++)
+                {
+                    if (sIndex >= s.Length) break;
+                    enc[j] += s[sIndex];
+                    sIndex++;
+                }
+            }
+
+            return string.Join(' ', enc);
         }
 
         // https://www.hackerrank.com/challenges/birthday-cake-candles/problem
