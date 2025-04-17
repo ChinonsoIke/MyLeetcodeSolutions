@@ -25,6 +25,35 @@ namespace ConsoleApp1
             Console.WriteLine(encryption("feedthedog"));
         }
 
+        // https://leetcode.com/problems/maximum-repeating-substring
+        public int MaxRepeating(string sequence, string word)
+        {
+            for (int i = 100; i > 0; i--)
+            {
+                var s = new StringBuilder().Insert(0, word, i).ToString();
+                if (sequence.IndexOf(s) > -1) return i;
+            }
+            return 0;
+        }
+
+        // https://leetcode.com/problems/longest-unequal-adjacent-groups-subsequence-i
+        public IList<string> GetLongestSubsequence(string[] words, int[] groups)
+        {
+            var list = new List<string> { words[0] };
+            int last = groups[0];
+
+            for (int i = 1; i < groups.Length; i++)
+            {
+                if (groups[i] != last)
+                {
+                    list.Add(words[i]);
+                    last = groups[i];
+                }
+            }
+
+            return list;
+        }
+
         // https://www.hackerrank.com/challenges/encryption/problem?isFullScreen=true
         public static string encryption(string s)
         {
