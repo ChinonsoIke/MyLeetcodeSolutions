@@ -465,32 +465,6 @@ namespace ConsoleApp1
             }
         }
 
-        public static int MaxRepeating(string sequence, string word)
-        {
-            int i = sequence.IndexOf(word);
-            if (i < 0) return 0;
-            int h1 = 0, h2 = 0;
-            //sequence = sequence.Substring(i+word.Length);
-
-            while (true)
-            {
-                h2++;
-                if (i + word.Length*2 <= sequence.Length && sequence.Substring(i+word.Length, word.Length) == word)
-                {
-                    sequence = sequence.Substring(word.Length);
-                    continue;
-                }
-                else
-                {
-                    sequence = sequence.Substring(i+word.Length/2);
-                    if (h2 > h1) h1 = h2;
-                    h2 = 0;
-                    i = sequence.IndexOf(word);
-                    if (i < 0) return h1;
-                }
-            }
-        }
-
         public static bool IsSubsequence(string s, string t)
         {
             if (String.IsNullOrEmpty(s)) return true;
