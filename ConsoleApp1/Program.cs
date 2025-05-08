@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 
 namespace ConsoleApp1
 {
@@ -20,9 +21,198 @@ namespace ConsoleApp1
                 }
         }
 
+        // Definition for a Node.
+        public class Node {
+            public int val;
+            public Node left;
+            public Node right;
+            public Node next;
+
+            public Node() {}
+    
+            public Node(int _val) {
+                val = _val;
+            }
+
+            public Node(int _val, Node _left, Node _right, Node _next) {
+                val = _val;
+                left = _left;
+                right = _right;
+                next = _next;
+            }
+        };
+
         static void Main(string[] args)
         {
-            Console.WriteLine(encryption("feedthedog"));
+            Console.WriteLine(MinRemoveToMakeValid("))(("));
+        }
+
+        public class Solution
+        {
+            public bool IsValidBST(TreeNode root)
+            {
+                var list = new List<int>();
+                return DFS(root, list);
+            }
+
+            public bool DFS(TreeNode root, List<int> list)
+            {
+                if (root == null) return true;
+                bool left = DFS(root.left, list);
+                if (list.Count > 0 && root.val <= list[list.Count - 1]) return false;
+                list.Add(root.val);
+                bool right = DFS(root.right, list);
+                return left && right;
+            }
+        }
+
+        public static string MinRemoveToMakeValid(string s)
+        {
+            Stack<(char c, int index)> stack = new Stack<(char, int)>();
+            var list = s.ToCharArray().ToList();
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (list[i] == '(') stack.Push((list[i], i));
+                else if (list[i] == ')')
+                {
+                    if (stack.Count < 1)
+                    {
+                        list.RemoveAt(i);
+                        i--;
+                    }
+                    else stack.Pop();
+                }
+            }
+
+            while (stack.Count > 0)
+            {
+                var t = stack.Pop();
+                list.RemoveAt(t.index);
+            }
+
+            return string.Join("", list);
+        }
+
+        public Node connect(Node root)
+        {
+            Queue<(Node node, int level)> q = new Queue<(Node, int)>();
+            var dict = new Dictionary<int, List<Node>>();
+            q.Enqueue((root,1));
+
+            while (q.Count > 0)
+            {
+                var cur = q.Dequeue();
+                int lev = cur.level + 1;
+                if (cur.node.left == null) break;
+
+                q.Enqueue((cur.node.left, lev));
+                q.Enqueue((cur.node.right, lev));
+
+                if (dict.ContainsKey(lev))
+                {
+                    dict[lev].Add(cur.node.left);
+                    dict[lev].Add(cur.node.right);
+                }
+                else
+                {
+                    dict.Add(lev, new List<Node> { cur.node.left, cur.node.right });
+                }
+            }
+
+            foreach (var item in dict)
+            {
+                for (int i = 0; i <= item.Value.Count - 1; i++)
+                {
+                    if (i + 1 < item.Value.Count) item.Value[i].next = item.Value[i + 1];
+                }
+            }
+
+            return root;
+        }
+
+        public static IList<IList<string>> Partition(string s)
+        {
+            var list = new List<IList<string>>();
+
+            var l2 = new List<string>();
+            for (int i = 0; i < s.Length; i++)
+            {
+                for (int j = i; j < s.Length; j++)
+                {
+                    if (s[j] == s[i])
+                    {
+                        //check if s[0-i] ispal and s[i+1-end] ispal
+                        string s1 = s.Substring(i, j + 1), s2 = s.Substring(j + 1);
+                        if (isPal(s1) && isPal(s2))
+                        {
+                            var l3 = new List<string>();
+                            if (!string.IsNullOrEmpty(s1)) l3.Add(s1);
+                            if (!string.IsNullOrEmpty(s2)) l3.Add(s2);
+                            list.Add(l3);
+                            i = j;
+                            break;
+                        }
+                    }
+                }
+
+            }
+
+            list.Add(l2);
+            return list;
+        }
+
+        public static bool isPal(string s)
+        {
+            for (int i = 0, j = s.Length - 1; i < j; i++, j--)
+            {
+                if (s[i] != s[j]) return false;
+            }
+            return true;
+        }
+
+        public static int CanCompleteCircuit(int[] gas, int[] cost)
+        {
+            int gaso = 0;
+            for (int i = 0; i < gas.Length; i++)
+            {
+                bool canGo = false;
+                if (gas[i] >= cost[i])
+                {
+                    canGo = true;
+                    gaso = gas[i];
+                    for (int j = i + 1; j < gas.Length; j++)
+                    {
+                        gaso += gas[j];
+                        gaso -= cost[j - 1];
+                        if (gaso < cost[j])
+                        {
+                            canGo = false;
+                            break;
+                        }
+                    }
+                    if (!canGo) continue;
+                    for (int j = 0; j < i; j++)
+                    {
+                        gaso += gas[j];
+                        int prev = j == 0 ? gas.Length - 1 : j - 1;
+                        gaso -= cost[prev];
+                        if (gaso < cost[j])
+                        {
+                            canGo = false;
+                            break;
+                        }
+                    }
+                    if (!canGo) continue;
+                    canGo = false;
+                    int prevI = i == 0 ? gas.Length - 1 : i - 1;
+                    if (gaso >= cost[prevI]) canGo = true;
+                }
+                if (canGo) return i;
+                gaso = 0;
+            }
+
+            return -1;
         }
 
         // https://leetcode.com/problems/maximum-repeating-substring
