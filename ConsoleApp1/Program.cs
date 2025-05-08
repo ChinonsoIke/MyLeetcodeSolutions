@@ -47,23 +47,38 @@ namespace ConsoleApp1
             Console.WriteLine(MinRemoveToMakeValid("))(("));
         }
 
-        public class Solution
+        public bool IsValidBST(TreeNode root)
         {
-            public bool IsValidBST(TreeNode root)
-            {
-                var list = new List<int>();
-                return DFS(root, list);
-            }
+            var list = new List<int>();
+            return DFS(root, list);
+        }
 
-            public bool DFS(TreeNode root, List<int> list)
-            {
-                if (root == null) return true;
-                bool left = DFS(root.left, list);
-                if (list.Count > 0 && root.val <= list[list.Count - 1]) return false;
-                list.Add(root.val);
-                bool right = DFS(root.right, list);
-                return left && right;
-            }
+        public bool DFS(TreeNode root, List<int> list)
+        {
+            if (root == null) return true;
+            bool left = DFS(root.left, list);
+            if (list.Count > 0 && root.val <= list[list.Count - 1]) return false;
+            list.Add(root.val);
+            bool right = DFS(root.right, list);
+            return left && right;
+        }
+
+        public TreeNode ConvertBST(TreeNode root)
+        {
+            var list = new List<TreeNode>();
+            DFS(root, 0);
+            return root;
+        }
+
+        public int DFS(TreeNode root, int sum)
+        {
+            if (root == null) return sum;
+            sum = DFS(root.right, sum);
+            int temp = root.val;
+            root.val += sum;
+            sum += temp;
+            sum = DFS(root.left, sum);
+            return sum;
         }
 
         public static string MinRemoveToMakeValid(string s)
