@@ -47,6 +47,45 @@ namespace ConsoleApp1
             Console.WriteLine(MinDeletion("yyyzz", 1));
         }
 
+        // https://leetcode.com/problems/find-minimum-time-to-reach-last-room-i/description/
+        public int MinTimeToReach(int[][] m)
+        {
+            int mY = m.Length, mX = m[0].Length;
+            bool[,] visited = new bool[mY, mX];
+
+            var pq = new PriorityQueue<(int i, int j, int t), int>();
+            pq.Enqueue((0, 0, 0), 0);
+            // top, right, down, left
+            int[][] dirs = new int[][] { new int[] { -1, 0 }, new int[] { 0, 1 }, new int[] { 1, 0 }, new int[] { 0, -1 } };
+
+            while (pq.Count > 0)
+            {
+                var u = pq.Dequeue();
+
+                if (visited[u.i, u.j]) continue;
+                visited[u.i, u.j] = true;
+                if ((u.i, u.j) == (mY - 1, mX - 1)) return u.t;
+
+                foreach (var dir in dirs)
+                {
+                    int y = u.i + dir[0];
+                    int x = u.j + dir[1];
+                    if (y < 0 || y >= mY || x < 0 || x >= mX) continue;
+
+                    (int i, int j) neighbor = (y, x);
+
+                    if (!visited[neighbor.i, neighbor.j])
+                    {
+                        int alt = Math.Max(m[neighbor.i][neighbor.j], u.t) + 1;
+
+                        pq.Enqueue((neighbor.i, neighbor.j, alt), alt);
+                    }
+                }
+            }
+
+            return -1;
+        }
+
         // https://leetcode.com/problems/minimum-deletions-for-at-most-k-distinct-characters/description/
         public static int MinDeletion(string s, int k)
         {
