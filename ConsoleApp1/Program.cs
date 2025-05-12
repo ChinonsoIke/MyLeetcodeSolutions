@@ -44,7 +44,30 @@ namespace ConsoleApp1
 
         static void Main(string[] args)
         {
-            Console.WriteLine(MinRemoveToMakeValid("))(("));
+            Console.WriteLine(MinDeletion("yyyzz", 1));
+        }
+
+        // https://leetcode.com/problems/minimum-deletions-for-at-most-k-distinct-characters/description/
+        public static int MinDeletion(string s, int k)
+        {
+            var dict = new Dictionary<char, int>();
+            foreach (char c in s)
+            {
+                if (!dict.ContainsKey(c)) dict.Add(c, 1);
+                else dict[c]++;
+            }
+
+            dict = dict.OrderBy(x => x.Value).ToDictionary();
+            int count = 0;
+
+            if (dict.Count == k) return 0;
+            foreach (var item in dict)
+            {
+                count += item.Value;
+                dict.Remove(item.Key);
+                if (dict.Count == k) return count;
+            }
+            return 0;
         }
 
         public bool IsValidBST(TreeNode root)
