@@ -47,6 +47,28 @@ namespace ConsoleApp1
             Console.WriteLine(MinDeletion("yyyzz", 1));
         }
 
+        // https://leetcode.com/problems/repeated-string-match/
+        public int RepeatedStringMatch(string a, string b)
+        {
+            if (string.IsNullOrEmpty(b)) return 0;
+
+            var sb = new StringBuilder();
+            sb.Append(a);
+            int c = 1;
+
+            while (sb.Length < b.Length)
+            {
+                sb.Append(a);
+                c++;
+            }
+
+            if (sb.ToString().Contains(b)) return c;
+            sb.Append(a);
+            c++;
+            if (sb.ToString().Contains(b)) return c;
+            return -1;
+        }
+
         // https://leetcode.com/problems/find-minimum-time-to-reach-last-room-i/description/
         public int MinTimeToReach(int[][] m)
         {
