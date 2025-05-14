@@ -49,6 +49,42 @@ namespace ConsoleApp1
             Console.WriteLine(app.Combine(4,3));
         }
 
+        // https://leetcode.com/problems/letter-combinations-of-a-phone-number/
+        public IList<string> LetterCombinations(string digits)
+        {
+            var list = new List<string>();
+            if (string.IsNullOrEmpty(digits)) return list;
+            var dict = new Dictionary<int, string>{
+            {2,"abc"},
+            {3,"def"},
+            {4,"ghi"},
+            {5,"jkl"},
+            {6,"mno"},
+            {7,"pqrs"},
+            {8,"tuv"},
+            {9,"wxyz"}
+        };
+
+            Combine(list, "", digits, dict);
+
+            return list;
+        }
+
+        public void Combine(List<string> list, string s, string digits, Dictionary<int, string> dict)
+        {
+            if (digits.Length == 0)
+            {
+                list.Add(s);
+                return;
+            }
+            int num = digits[0] - '0';
+
+            foreach (char c in dict[num])
+            {
+                Combine(list, s + c, digits.Length > 1 ? digits.Substring(1) : "", dict);
+            }
+        }
+
         // https://leetcode.com/problems/combinations/description/
         public IList<IList<int>> Combine(int n, int k)
         {
