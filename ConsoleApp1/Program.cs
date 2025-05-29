@@ -48,6 +48,8 @@ namespace ConsoleApp1
             return max;
         }
 
+
+        // https://leetcode.com/problems/sum-root-to-leaf-numbers/
         public int SumNumbers(TreeNode root)
         {
             int total = 0;
@@ -58,9 +60,10 @@ namespace ConsoleApp1
         public void dfs(TreeNode root, string sum, ref int total)
         {
             if (root == null) return;
-            if (root.left == null || root.right == null) total += int.Parse(sum);
-            dfs(root.left, sum + root.val, ref total);
-            dfs(root.right, sum + root.val, ref total);
+            string sum2 = sum + root.val;
+            if (root.left == null && root.right == null) total += int.Parse(sum2);
+            dfs(root.left, sum2, ref total);
+            dfs(root.right, sum2, ref total);
         }
 
         public int FindPeakElement(int[] nums)
