@@ -119,6 +119,7 @@ namespace ConsoleApp1
             return list;
         }
 
+        // https://leetcode.com/problems/maximum-gap/
         public int MaximumGap(int[] nums)
         {
             if (nums.Length < 2) return 0;
