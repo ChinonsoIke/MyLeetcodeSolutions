@@ -12,12 +12,201 @@ namespace ConsoleApp1
         static void Main(string[] args)
         {
             var app = new Program();
-            Console.WriteLine(app.Combine(4,3));
+            var root = new TreeNode(1);
+            root.left = new TreeNode(2);
+            root.right = new TreeNode(3);    
+            Console.WriteLine(app.MaxProduct(["abcw", "baz", "foo", "bar", "xtfn", "abcdef"]));
+        }
+
+        // https://leetcode.com/problems/maximum-product-of-word-lengths/
+        public int MaxProduct(string[] words)
+        {
+            int max = 0;
+            var arr = new string[words.Length];
+
+            for (int i = 0; i < words.Length; i++)
+            {
+                arr[i] = new string(words[i].Distinct().ToArray());
+            }
+
+            for (int i = 0; i < arr.Length; i++)
+            {
+                for (int j = i + 1; j < arr.Length; j++)
+                {
+                    bool match = true;
+                    for (int k = 97; k < 123; k++)
+                    {
+                        if (arr[i].Contains((char)k) && arr[j].Contains((char)k))
+                        {
+                            match = false;
+                            break;
+                        }
+                    }
+                    if (match && words[i].Length * words[j].Length > max) max = words[i].Length * words[j].Length;
+                }
+            }
+            return max;
+        }
+
+        public int SumNumbers(TreeNode root)
+        {
+            int total = 0;
+            dfs(root, "", ref total);
+            return total;
+        }
+
+        public void dfs(TreeNode root, string sum, ref int total)
+        {
+            if (root == null) return;
+            if (root.left == null || root.right == null) total += int.Parse(sum);
+            dfs(root.left, sum + root.val, ref total);
+            dfs(root.right, sum + root.val, ref total);
+        }
+
+        public int FindPeakElement(int[] nums)
+        {
+            int max = 0;
+            return Bin(nums, 0, nums.Length - 1, ref max);
+        }
+
+        public int Bin(int[] nums, int start, int end, ref int max)
+        {
+            if (end == start) return max;
+            if (nums[end] > nums[end - 1])
+            {
+                if (end == nums.Length - 1 || nums[end] > nums[end + 1]) max = end;
+            }
+            if (nums[start] > nums[start + 1])
+            {
+                if (start == 0 || nums[start] > nums[start - 1]) max = start;
+            }
+
+            int mid = (start + end) / 2;
+            if (nums[mid] > nums[mid + 1])
+                return Bin(nums, start, mid, ref max);
+            return Bin(nums, mid + 1, end, ref max);
+        }
+
+        public IList<int> LargestValues(TreeNode root)
+        {
+            var list = new List<int>();
+            if (root == null) return list;
+            Queue<(TreeNode node, int level)> q = new Queue<(TreeNode, int)>();
+            q.Enqueue((root, 0));
+            list.Add(root.val);
+
+            while (q.Count > 0)
+            {
+                var cur = q.Dequeue();
+                if (cur.node.val > list[cur.level]) list[cur.level] = cur.node.val;
+
+                if ((cur.node.left != null || cur.node.right != null) && list.Count == cur.level + 1) list.Add(int.MinValue);
+                if (cur.node.left != null)
+                {
+                    q.Enqueue((cur.node.left, cur.level + 1));
+                }
+                if (cur.node.right != null)
+                {
+                    q.Enqueue((cur.node.right, cur.level + 1));
+                }
+            }
+
+            return list;
+        }
+
+        public int MaximumGap(int[] nums)
+        {
+            if (nums.Length < 2) return 0;
+            int max = int.MinValue, min = int.MaxValue, maxGap = 0;
+            for (int i = 0; i < nums.Length; i++)
+            {
+                if (nums[i] < min) min = nums[i];
+                if (nums[i] > max) max = nums[i];
+            }
+
+            if (max == min) return 0;
+
+            int[] bucket = new int[(max - min) + 1];
+            for (int i = 0; i < nums.Length; i++)
+            {
+                bucket[nums[i] - min] = -1;
+            }
+
+            int? last = bucket[min - min] == -1 ? 0 : null;
+            for (int i = 1; i < bucket.Length; i++)
+            {
+                if (!last.HasValue && bucket[i] == -1)
+                {
+                    last = i;
+                    continue;
+                }
+
+                if (bucket[i] == -1)
+                {
+                    if (i - last.Value > maxGap) maxGap = i - last.Value;
+                    last = i;
+                }
+            }
+
+            return maxGap;
+        }
+
+        public int CoinChange(int[] coins, int amount)
+        {
+            int num = 0;
+            Array.Sort(coins);
+            for (int i = coins.Length-1; i >= 0; i--)
+            {
+                if(amount / coins[i] > 1)
+                {
+                    num += amount / coins[i];
+                    amount %= coins[i];
+                }
+            }
+
+            return amount == 0 ? num : -1;
+        }
+
+        public int maxCreds(int[] wh, int d1, int d2, int skips)
+        {
+            int creds = 0;
+
+            for (int i = 0; i < wh.Length; i++)
+            {
+                bool d1Turn = true;
+
+                while (wh[i] > 0)
+                {
+                    if (wh[i] <= d2 && !d1Turn && skips > 0)
+                    {
+                        d1Turn = true;
+                        skips--;
+                    }
+
+                    if(d1Turn)
+                    {
+                        wh[i] -= d1;
+                    }
+                    else
+                    {
+                        wh[i] -= d2;
+                    }
+
+                    if (wh[i] <= 0 && d1Turn)
+                    {
+                        creds++;
+                    }
+                    d1Turn = !d1Turn;
+                }
+            }
+
+            return creds;
         }
 
         // https://leetcode.com/problems/remove-duplicates-from-sorted-list-ii/
         public ListNode DeleteDuplicates(ListNode head)
         {
+            int rand = new Random().Next(0,10);
             ListNode cur = head, prev = null;
             while (cur != null)
             {
