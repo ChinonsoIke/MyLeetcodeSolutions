@@ -18,6 +18,80 @@ namespace ConsoleApp1
             Console.WriteLine(app.MaxProduct(["abcw", "baz", "foo", "bar", "xtfn", "abcdef"]));
         }
 
+        // https://leetcode.com/problems/add-two-numbers/description/
+        public ListNode AddTwoNumbers(ListNode l1, ListNode l2)
+        {
+            ListNode cur1 = l1.next, cur2 = l2.next, res = new ListNode(l1.val + l2.val), cur3 = res;
+            bool rem = false;
+            if (res.val > 9)
+            {
+                res.val -= 10;
+                rem = true;
+            }
+
+            while (cur1 != null && cur2 != null)
+            {
+                if (rem)
+                {
+                    cur1.val++;
+                    rem = false;
+                }
+
+                int sum = cur1.val + cur2.val;
+                if (sum > 9)
+                {
+                    sum -= 10;
+                    rem = true;
+                }
+                cur3.next = new ListNode(sum);
+                cur1 = cur1.next;
+                cur2 = cur2.next;
+                cur3 = cur3.next;
+            }
+
+            while (cur1 != null)
+            {
+                if (rem)
+                {
+                    cur1.val++;
+                    rem = false;
+                }
+
+                if (cur1.val > 9)
+                {
+                    cur1.val -= 10;
+                    rem = true;
+                }
+
+                cur3.next = new ListNode(cur1.val);
+                cur1 = cur1.next;
+                cur3 = cur3.next;
+            }
+
+            while (cur2 != null)
+            {
+                if (rem)
+                {
+                    cur2.val++;
+                    rem = false;
+                }
+
+                if (cur2.val > 9)
+                {
+                    cur2.val -= 10;
+                    rem = true;
+                }
+
+                cur3.next = new ListNode(cur2.val);
+                cur2 = cur2.next;
+                cur3 = cur3.next;
+            }
+
+            if (rem) cur3.next = new ListNode(1);
+
+            return res;
+        }
+
         // https://leetcode.com/problems/integer-to-roman/description/
         public string IntToRoman(int num)
         {
