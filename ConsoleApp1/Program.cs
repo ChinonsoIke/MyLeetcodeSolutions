@@ -18,6 +18,78 @@ namespace ConsoleApp1
             Console.WriteLine(app.MaxProduct(["abcw", "baz", "foo", "bar", "xtfn", "abcdef"]));
         }
 
+        // https://leetcode.com/problems/integer-to-roman/description/
+        public string IntToRoman(int num)
+        {
+            var s = new StringBuilder();
+            string sum = num.ToString();
+
+            for (int i = 0; i < sum.Length; i++)
+            {
+                if (sum[i] == '0') continue;
+
+                if (sum[i] == '4' || sum[i] == '9')
+                {
+                    int l = sum.Substring(i).Length;
+                    switch (l)
+                    {
+                        case 3:
+                            if (sum[i] == '4') s.Append("CD");
+                            else s.Append("CM");
+                            break;
+                        case 2:
+                            if (sum[i] == '4') s.Append("XL");
+                            else s.Append("XC");
+                            break;
+                        case 1:
+                            if (sum[i] == '4') s.Append("IV");
+                            else s.Append("IX");
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else
+                {
+                    int n = int.Parse(sum.Substring(i));
+                    if (n >= 1000)
+                    {
+                        for (int q = 0; q < n / 1000; q++) s.Append("M");
+                    }
+                    else if (n >= 500)
+                    {
+                        s.Append("D");
+                        for (int q = 0; q < sum[i] - '5'; q++) s.Append("C");
+                    }
+                    else if (n >= 100)
+                    {
+                        for (int q = 0; q < sum[i] - '0'; q++) s.Append("C");
+                    }
+                    else if (n >= 50)
+                    {
+                        s.Append("L");
+                        for (int q = 0; q < sum[i] - '5'; q++) s.Append("X");
+                    }
+                    else if (n >= 10)
+                    {
+                        s.Append("X");
+                        for (int q = 0; q < sum[i] - '1'; q++) s.Append("X");
+                    }
+                    else if (n >= 5)
+                    {
+                        s.Append("V");
+                        for (int q = 0; q < sum[i] - '5'; q++) s.Append("I");
+                    }
+                    else
+                    {
+                        for (int q = 0; q < sum[i] - '0'; q++) s.Append("I");
+                    }
+                }
+            }
+
+            return s.ToString();
+        }
+
         // https://leetcode.com/problems/maximum-product-of-word-lengths/
         public int MaxProduct(string[] words)
         {
