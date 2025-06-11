@@ -1,21 +1,107 @@
-﻿using System;
+﻿using Grpc.Net.Client;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace ConsoleApp1
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             var app = new Program();
-            var root = new TreeNode(1);
-            root.left = new TreeNode(2);
-            root.right = new TreeNode(3);    
-            Console.WriteLine(app.MaxProduct(["abcw", "baz", "foo", "bar", "xtfn", "abcdef"]));
+            //var root = new TreeNode(1);
+            //root.left = new TreeNode(2);
+            //root.right = new TreeNode(3);
+            var head = new ListNode(1);
+            head.next = new ListNode(2);
+            head.next.next = new ListNode(3);
+            head.next.next.next = new ListNode(4);
+            Console.WriteLine(app.SwapPairs(head));
+            //await app.RunGrpc();
+        }
+
+        // https://leetcode.com/problems/swap-nodes-in-pairs/description/
+        public ListNode SwapPairs(ListNode head)
+        {
+            ListNode prev = head, cur = head?.next, past = null;
+
+            while (cur != null && prev != null)
+            {
+                prev.next = cur.next;
+                cur.next = prev;
+                if (prev.Equals(head)) head = cur;
+
+                if (past != null) past.next = cur;
+                past = prev;
+                cur = prev.next?.next;
+                prev = prev.next;
+            }
+
+            return head;
+        }
+        public int ThreeSumClosest(int[] nums, int target)
+        {
+            int min = int.MaxValue, sum = 0;
+
+            for (int i = 0; i < nums.Length; i++)
+            {
+                for (int j = 0; j < nums.Length; j++)
+                {
+                    for (int k = 0; k < nums.Length; k++)
+                    {
+                        if (i != j && j != k && i != k && (Math.Abs((nums[i] + nums[j] + nums[k]) - target) < min))
+                        {
+                            sum = nums[i] + nums[j] + nums[k];
+                            min = (nums[i] + nums[j] + nums[k]) - target;
+                            Console.WriteLine($"{sum}-{min}");
+                        }
+                    }
+                }
+            }
+
+            return sum;
+        }
+
+        public async Task RunGrpc()
+        {
+            using var channel = GrpcChannel.ForAddress("https://localhost:7241");
+            var client = new Greeter.GreeterClient(channel);
+            var reply = await client.SayHelloAsync(
+                new HelloRequest { Name = "GreeterClient" });
+            Console.WriteLine("Greeting: " + reply.Message);
+            Console.WriteLine("Press any key to exit...");
+            Console.ReadKey();
+        }
+
+        public IList<IList<int>> ThreeSum(int[] nums)
+        {
+            var list = new List<IList<int>>();
+            var dict = new Dictionary<string, int>();
+
+            for (int i = 0; i < nums.Length && nums[i] > 0; i++)
+            {
+                for (int j = 0; j < nums.Length && nums[j] <= 0; j++)
+                {
+                    for (int k = 0; k < nums.Length && nums[k] <= 0; k++)
+                    {
+                        if (i != j && j != k && i != k && (nums[i] + nums[j] + nums[k] == 0))
+                        {
+                            var l = new List<int> { nums[i], nums[j], nums[k] };
+                            l.Sort();
+                            if (dict.ContainsKey(string.Join("", l))) continue;
+                            dict.Add(string.Join("", l), 0);
+                            list.Add(l);
+                        }
+                    }
+                }
+            }
+
+            return list;
         }
 
         // https://leetcode.com/problems/add-two-numbers/description/
