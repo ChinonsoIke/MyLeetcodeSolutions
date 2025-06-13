@@ -21,8 +21,68 @@ namespace ConsoleApp1
             head.next = new ListNode(2);
             head.next.next = new ListNode(3);
             head.next.next.next = new ListNode(4);
-            Console.WriteLine(app.SwapPairs(head));
+            Console.WriteLine(app.SearchRange([5, 7, 7, 8, 8, 10], 8));
             //await app.RunGrpc();
+        }
+
+        // https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/description/
+        public int[] SearchRange(int[] nums, int target)
+        {
+            return binarySearch(nums, target, 0, nums.Length - 1, [-1, -1]);
+        }
+
+        public int[] binarySearch(int[] nums, int target, int start, int end, int[] f)
+        {
+            if (start > end) 
+                return f;
+
+            int mid = (start + end) / 2;
+
+            if (nums[mid] == target)
+            {
+                f[1] = Math.Max(mid, f[1]);
+                f[0] = f[0] != -1 ? Math.Min(mid, f[0]) : mid;
+            }
+
+            binarySearch(nums, target, start, mid - 1, f);
+            binarySearch(nums, target, mid + 1, end, f);
+
+            return f;
+        }
+
+        public int Search(int[] nums, int target)
+        {
+            return binarySearch(nums, target, 0, nums.Length - 1);
+        }
+
+        public int binarySearch(int[] nums, int target, int start, int end)
+        {
+            if (start > end) return -1;
+
+            int mid = (start + end) / 2;
+            if (nums[mid] == target) return mid;
+
+            if (nums[start] > target && nums[mid] > target) return binarySearch(nums, target, mid + 1, end);
+            else return binarySearch(nums, target, start, mid - 1);
+
+            // if(nums[mid+1] > nums[mid] && target > nums[mid]) return binarySearch(nums, target, mid+1, end);
+            // if(nums[start] > target && nums[mid] > target) return binarySearch(nums, target, mid+1, end);
+            // else if(nums[end] < target && nums[mid] < target) return binarySearch(nums, target, start, mid-1);
+            // else if(nums[mid] > target) return binarySearch(nums, target, start, mid-1);
+            // else return binarySearch(nums, target, mid+1, end);
+        }
+
+        public int Divide(int dividend, int divisor)
+        {
+            long q = 0, t1 = dividend, t2 = divisor;
+
+            while (Math.Abs(t1) >= Math.Abs(t2))
+            {
+                t1 = Math.Abs(t1) - Math.Abs(t2);
+                q++;
+            }
+
+            return ((divisor > 0 && dividend > 0) || (divisor < 0 && dividend < 0)) ? (int)q : (int)-q;
         }
 
         // https://leetcode.com/problems/swap-nodes-in-pairs/description/
