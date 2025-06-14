@@ -21,8 +21,40 @@ namespace ConsoleApp1
             head.next = new ListNode(2);
             head.next.next = new ListNode(3);
             head.next.next.next = new ListNode(4);
-            Console.WriteLine(app.SearchRange([5, 7, 7, 8, 8, 10], 8));
+            Console.WriteLine(app.CountAndSay(4));
             //await app.RunGrpc();
+        }
+
+        // https://leetcode.com/problems/count-and-say/description/
+        public string CountAndSay(int n)
+        {
+            string prev = "1";
+            var sb = new StringBuilder();
+
+            for (int i = 1; i < n; i++)
+            {
+                int count = 1;
+                for (int j = 1; j < prev.Length; j++)
+                {
+                    if (prev[j] != prev[j - 1])
+                    {
+                        sb.Append($"{count}{prev[j-1]}");
+                        count = 1;
+                    }
+                    else count++;
+
+                    if (j == prev.Length - 1)
+                    {
+                        sb.Append($"{count}{prev[j]}");
+                    }
+                }
+
+                if (i == 1) sb.Append($"{count}{prev[0]}");
+                prev = sb.ToString();
+                sb.Clear();
+            }
+
+            return prev;
         }
 
         // https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/description/
