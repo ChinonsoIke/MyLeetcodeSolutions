@@ -21,8 +21,111 @@ namespace ConsoleApp1
             head.next = new ListNode(2);
             head.next.next = new ListNode(3);
             head.next.next.next = new ListNode(4);
-            Console.WriteLine(app.CountAndSay(4));
+            //Console.WriteLine(app.MaxArea([1, 8, 6, 2, 5, 4, 8, 3, 7]));
             //await app.RunGrpc();
+        }
+
+        // https://leetcode.com/problems/rotate-image/description/
+        public void Rotate90(int[][] m)
+        {
+            // rotate 90 = transpose + reverse row
+            // 180 = reverse row + reverse column
+            // 270 = transpose + reverse col
+
+            // transpose
+            for (int i = 0; i < m.Length; i++)
+            {
+                for (int j = i + 1; j < m[i].Length; j++)
+                {
+                    int temp = m[i][j];
+                    m[i][j] = m[j][i];
+                    m[j][i] = temp;
+                }
+            }
+
+            // reverse
+            for (int i = 0; i < m.Length; i++)
+            {
+                for (int j = 0, k = m[i].Length - 1; j < k; j++, k--)
+                {
+                    int temp = m[i][j];
+                    m[i][j] = m[i][k];
+                    m[i][k] = temp;
+                }
+            }
+        }
+
+        public int KthSmallest(int[] arr, int k)
+        {
+            // Code Here
+            for (int i = arr.Length / 2 - 1; i >= 0; i--)
+            {
+                Heapify(arr, i);
+            }
+
+            int c = 0;
+            for (int i = 0; i < k; i++)
+            {
+                c = Dequeue(arr);
+            }
+
+            return c;
+        }
+
+        public void Heapify(int[] arr, int i)
+        {
+            int smallest = i;
+            int l = i * 2 + 1, r = i * 2 + 2;
+
+            if (arr[l] < arr[smallest]) smallest = l;
+            if (r < arr.Length && arr[r] < arr[smallest]) smallest = r;
+
+            if (smallest != i)
+            {
+                int temp = arr[i];
+                arr[i] = arr[smallest];
+                arr[smallest] = temp;
+
+                Heapify(arr, i);
+            }
+        }
+
+        public int Dequeue(int[] arr)
+        {
+            int temp = arr[0];
+            arr[0] = arr[arr.Length - 1];
+            arr[arr.Length - 1] = int.MaxValue;
+            for (int i = arr.Length / 2 - 1; i >= 0; i--)
+            {
+                Heapify(arr, i);
+            }
+            return temp;
+        }
+
+        public int LengthOfLongestSubstring(string s)
+        {
+            if (string.IsNullOrEmpty(s)) return 0;
+
+            int max = int.MinValue;
+            var set = new HashSet<char>();
+            for (int i = 0; i < s.Length; i++)
+            {
+                var sub = s.Substring(i);
+                for (int j = 0; j < sub.Length - 1; j++)
+                {
+                    int size = set.Count();
+                    set.Add(sub[j]);
+                    if (set.Count == size)
+                    {
+                        max = Math.Max(max, size);
+                        set.Clear();
+                        break;
+                    }
+                }
+                max = Math.Max(max, set.Count());
+            }
+
+            return max;
         }
 
         // https://leetcode.com/problems/count-and-say/description/
@@ -1432,19 +1535,6 @@ namespace ConsoleApp1
             }
 
             return days;
-        }
-
-        public static int MaxArea(int[] height)
-        {
-            int maxHeight = height[0], maxArea = 0;
-            for (int i = 1; i < height.Length; i++)
-            {
-                int min = Math.Min(height[i], maxHeight);
-                maxArea = Math.Max(maxArea, min * min);
-                maxHeight = Math.Max(maxHeight, height[i]);
-            }
-
-            return maxArea;
         }
 
         public static void Merge(int[] a, int[] b)
