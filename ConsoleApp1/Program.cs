@@ -21,8 +21,23 @@ namespace ConsoleApp1
             head.next = new ListNode(2);
             head.next.next = new ListNode(3);
             head.next.next.next = new ListNode(4);
-            //Console.WriteLine(app.MaxArea([1, 8, 6, 2, 5, 4, 8, 3, 7]));
+            Console.WriteLine(app.MaxArea([1, 8, 6, 2, 5, 4, 8, 3, 7]));
             //await app.RunGrpc();
+        }
+
+        // https://leetcode.com/problems/container-with-most-water/description/
+        public int MaxArea(int[] height)
+        {
+            int maxArea = 0, i = 0, j = height.Length - 1;
+
+            while (i < j)
+            {
+                maxArea = Math.Max(maxArea, (j - i) * Math.Min(height[j], height[i]));
+                if (height[i] < height[j]) i++;
+                else j--;
+            }
+
+            return maxArea;
         }
 
         // https://leetcode.com/problems/jump-game-ii/
