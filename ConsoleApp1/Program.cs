@@ -25,6 +25,27 @@ namespace ConsoleApp1
             //await app.RunGrpc();
         }
 
+        // https://leetcode.com/problems/jump-game-ii/
+        public int Jump(int[] nums)
+        {
+            // F(i) is the minimum number of jumps to reach the ith index
+            // F(0) = 0, F(1) = nums[0] > 0 ? F(0) + 1 : 0
+
+            int[] dp = new int[nums.Length];
+            for (int i = 0; i < nums.Length; i++)
+            {
+                int c = 0;
+                for (int j = i + 1; j < nums.Length && c < nums[i]; j++)
+                {
+                    if (dp[j] > 0) dp[j] = Math.Min(dp[j], dp[i] + 1);
+                    else dp[j] = dp[i] + 1;
+                    c++;
+                }
+            }
+
+            return dp[dp.Length - 1];
+        }
+
         // https://leetcode.com/problems/rotate-image/description/
         public void Rotate90(int[][] m)
         {
