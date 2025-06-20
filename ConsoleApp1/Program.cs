@@ -11,18 +11,176 @@ namespace ConsoleApp1
 {
     internal class Program
     {
+        //public record struct rNode(int i, int j);
         static async Task Main(string[] args)
         {
             var app = new Program();
-            //var root = new TreeNode(1);
-            //root.left = new TreeNode(2);
-            //root.right = new TreeNode(3);
-            var head = new ListNode(1);
-            head.next = new ListNode(2);
-            head.next.next = new ListNode(3);
-            head.next.next.next = new ListNode(4);
-            Console.WriteLine(app.MaxArea([1, 8, 6, 2, 5, 4, 8, 3, 7]));
-            //await app.RunGrpc();
+            //TreeNode tree1 = app.BuildTree([1, 2, 2, 3, 3, null, null, 4, 4]);
+            //int a = 1011_0111, b = ~a;
+            Console.WriteLine(app.NumIslands([['1', '1', '1', '1', '0'], ['1', '1', '0', '1', '0'], ['1', '1', '0', '0', '0'], ['0', '0', '0', '0', '0']]));
+        }
+
+        // https://leetcode.com/problems/number-of-islands/
+        public int NumIslands(char[][] grid)
+        {
+            int[][] dirs = [[-1, 0], [0, 1], [1, 0], [0, -1]]; // up, right, down, left
+            int m = grid.Length, n = grid[0].Length, count = 0;
+
+            for (int i = 0; i < grid.Length; i++)
+            {
+                for (int j = 0; j < grid[i].Length; j++)
+                {
+                    if (grid[i][j] == '1')
+                    {
+                        count++;
+                        var stack = new Stack<int[]>();
+                        stack.Push([i,j]);
+                        while(stack.Count > 0)
+                        {
+                            var cur = stack.Pop();
+                            grid[cur[0]][cur[1]] = '-';
+                            foreach (var dir in dirs)
+                            {
+                                if (cur[0] + dir[0] < 0 || cur[0] + dir[0] > m-1 || cur[1] + dir[1] < 0 || cur[1] + dir[1] > n-1) continue;
+                                if (grid[cur[0] + dir[0]][cur[1] + dir[1]] == '1') stack.Push([cur[0] + dir[0], cur[1] + dir[1]]);
+                            }                            
+                        }
+                    }
+                }
+            }
+
+            return count;
+        }
+
+        public int LastStoneWeight(int[] stones)
+        {
+            var pq = new PriorityQueue<int[], int>();
+            var list = stones.ToList();
+
+            while (list.Count > 1)
+            {
+                BuildPq(pq, list);
+                int[] i = pq.Dequeue(), j = pq.Dequeue();
+                if (i[0] < j[0])
+                {
+                    list[j[1]] -= i[0];
+                    list.RemoveAt(i[1]);
+                }
+                else
+                {
+                    list.RemoveAt(i[1]);
+                    list.RemoveAt(j[1]-1);
+                }
+            }
+
+            Console.WriteLine(string.Join(",", list));
+            return list.FirstOrDefault();
+        }
+
+        public void BuildPq(PriorityQueue<int[], int> pq, List<int> stones)
+        {
+            pq.Clear();
+            int i = 0, c = 0;
+            while (c < 2 && i < stones.Count)
+            {
+                pq.Enqueue([stones[i], i], stones[i]);
+                c++;
+                i++;
+            }
+            for (int j = i; j < stones.Count; j++)
+            {
+                if (stones[j] > pq.Peek()[0])
+                {
+                    pq.Dequeue();
+                    pq.Enqueue([stones[j], j], stones[j]);
+                }
+            }
+        }
+        public bool IsBalanced(TreeNode root)
+        {
+            bool balanced = true;
+            DFS(root, 0, ref balanced);
+            return balanced;
+        }
+
+        public int DFS(TreeNode root, int count, ref bool balanced)
+        {
+            if (root == null) return count;
+            var left = DFS(root.left, count + 1, ref balanced);
+            var right = DFS(root.right, count + 1, ref balanced);
+
+            if (left != right) balanced = false;
+            return count;
+        }
+
+        public bool IsPalindrome(string s)
+        {
+            var arr = s.ToCharArray();
+            var arr2 = new List<char>();
+
+            for (int i = 0; i < arr.Length; i++)
+            {
+                if ((arr[i] >= 'a' && arr[i] <= 'z') || (arr[i] >= 'A' && arr[i] <= 'Z') || (arr[i] >= '0' && arr[i] <= '9')) arr2.Add(Char.ToLower(arr[i]));
+            }
+
+            for (int i = 0, n = arr2.Count, j = n - 1; i < j; i++, j--)
+            {
+                if (arr2[i] != arr2[j]) return false;
+            }
+
+            return true;
+        }
+
+        public List<int> authEvents(List<List<string>> events)
+        {
+            // setPassword-000A
+            // authorize-108738450
+            // authorize-108738449
+            // authorize-244736787
+
+            int passwordHash = 0;
+            var alts = new List<int>();
+            var list = new List<int>();
+
+            foreach (var e in events)
+            {
+                if (e[0] == "setPassword")
+                {
+                    passwordHash = hash(e[1]);
+                    alts.Clear();
+                    //Console.Write(hash(e[1] + 'z'));
+                    for (int i = 1; i < 127; i++)
+                    {
+                        alts.Add(hash(e[1] + (char)i));
+                    }
+                }
+                else
+                {
+                    int p = int.Parse(e[1]);
+                    if (p == passwordHash) list.Add(1);
+                    else if (alts.Contains(p)) list.Add(1);
+                    else list.Add(0);
+                }
+            }
+
+            // Console.Write(alts.Last());
+            // Console.Write(string.Join(",",alts));
+            return list;
+        }
+
+        public int hash(string s)
+        {
+            int k = 0;
+            for (int i = 0, j = s.Length - 1; j >= 0; i++, j--)
+            {
+                k += f(s[i]) * (int)Math.Pow(131, j);
+            }
+            return k;
+        }
+
+        public int f(char c)
+        {
+            return (int)c;
         }
 
         // https://leetcode.com/problems/container-with-most-water/description/
@@ -1921,6 +2079,40 @@ namespace ConsoleApp1
             }
 
             return false;
+        }
+
+        public TreeNode BuildTree(int?[] values)
+        {
+            if (values == null || values.Length == 0 || values[0] == null)
+                return null;
+
+            TreeNode root = new TreeNode(values[0].Value);
+            Queue<TreeNode> queue = new Queue<TreeNode>();
+            queue.Enqueue(root);
+
+            int i = 1;
+            while (i < values.Length)
+            {
+                TreeNode current = queue.Dequeue();
+
+                // Left child
+                if (i < values.Length && values[i] != null)
+                {
+                    current.left = new TreeNode(values[i].Value);
+                    queue.Enqueue(current.left);
+                }
+                i++;
+
+                // Right child
+                if (i < values.Length && values[i] != null)
+                {
+                    current.right = new TreeNode(values[i].Value);
+                    queue.Enqueue(current.right);
+                }
+                i++;
+            }
+
+            return root;
         }
     }
 }
