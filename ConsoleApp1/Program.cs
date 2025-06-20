@@ -20,6 +20,46 @@ namespace ConsoleApp1
             Console.WriteLine(app.NumIslands([['1', '1', '1', '1', '0'], ['1', '1', '0', '1', '0'], ['1', '1', '0', '0', '0'], ['0', '0', '0', '0', '0']]));
         }
 
+        // https://leetcode.com/problems/max-area-of-island/description/
+        public int MaxAreaOfIsland(int[][] grid)
+        {
+            int[][] dirs = [[-1, 0], [0, 1], [1, 0], [0, -1]]; // up, right, down, left
+            int m = grid.Length, n = grid[0].Length, max = 0;
+
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    if (grid[i][j] == 1)
+                    {
+                        int count = 0;
+                        var stack = new Stack<int[]>();
+                        grid[i][j] = -1;
+                        stack.Push([i, j]);
+                        while (stack.Count > 0)
+                        {
+                            count++;
+                            var cur = stack.Pop();
+                            foreach (var dir in dirs)
+                            {
+                                if (cur[0] + dir[0] < 0 || cur[0] + dir[0] > m - 1 || cur[1] + dir[1] < 0 || cur[1] + dir[1] > n - 1) continue;
+                                if (grid[cur[0] + dir[0]][cur[1] + dir[1]] == 1)
+                                {
+                                    grid[cur[0] + dir[0]][cur[1] + dir[1]] = -1;
+                                    stack.Push([cur[0] + dir[0], cur[1] + dir[1]]);
+
+                                }
+                            }
+                        }
+
+                        if (count > max) max = count;
+                    }
+                }
+            }
+
+            return max;
+        }
+
         // https://leetcode.com/problems/number-of-islands/
         public int NumIslands(char[][] grid)
         {
