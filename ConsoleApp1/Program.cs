@@ -11,13 +11,116 @@ namespace ConsoleApp1
 {
     internal class Program
     {
-        //public record struct rNode(int i, int j);
+        public record struct rNode(int i, int j);
         static async Task Main(string[] args)
         {
             var app = new Program();
             //TreeNode tree1 = app.BuildTree([1, 2, 2, 3, 3, null, null, 4, 4]);
             //int a = 1011_0111, b = ~a;
-            Console.WriteLine(app.NumIslands([['1', '1', '1', '1', '0'], ['1', '1', '0', '1', '0'], ['1', '1', '0', '0', '0'], ['0', '0', '0', '0', '0']]));
+            Console.WriteLine(app.OrangesRotting([[2, 1, 1], [0, 1, 1], [1, 0, 1]]));
+        }
+
+        // https://leetcode.com/problems/clone-graph/
+        public Node CloneGraph(Node node)
+        {
+            if (node == null) return null;
+
+            var visited = new bool[101];
+            var list = new Node[101];
+            var q1 = new Queue<Node>();
+            var q2 = new Queue<Node>();
+            var newNode = new Node(1);
+            list[1] = newNode;
+            q1.Enqueue(node);
+            q2.Enqueue(newNode);
+            visited[1] = true;
+
+            while (q1.Count() > 0)
+            {
+                Node c1 = q1.Dequeue(), c2 = q2.Dequeue();
+                for (int i = 0; i < c1.neighbors.Count; i++)
+                {
+                    if (visited[c1.neighbors[i].val]) c2.neighbors.Add(list[c1.neighbors[i].val]);
+                    else
+                    {
+                        c2.neighbors.Add(new Node(c1.neighbors[i].val));
+                        list[c2.neighbors[i].val] = c2.neighbors[i];
+
+                        q1.Enqueue(c1.neighbors[i]);
+                        q2.Enqueue(c2.neighbors[i]);
+                        visited[c2.neighbors[i].val] = true;
+                    }
+                }
+            }
+
+            return newNode;
+        }
+
+        public int OrangesRotting(int[][] grid)
+        {
+            int[][] dirs = [[-1, 0], [0, 1], [1, 0], [0, -1]]; // up, right, down, left
+            int m = grid.Length, n = grid[0].Length;
+            var dict = new Dictionary<rNode, int>();
+            var visited = new Dictionary<rNode, bool>();
+            var visitedGen = new Dictionary<rNode, bool>();
+            var distances = new Dictionary<rNode, int>();
+
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    if (grid[i][j] == 1 && (!visitedGen.ContainsKey(new rNode(i, j)) || !visitedGen[new rNode(i, j)]))
+                        dict.Add(new rNode(i, j), 0);
+
+                    if (grid[i][j] == 2)
+                    {
+                        visited.Clear();
+                        grid[i][j] = 3;
+                        var q = new Queue<int[]>();
+                        q.Enqueue([i, j, 0]);
+
+                        while (q.Count > 0)
+                        {
+                            var cur = q.Dequeue();
+                            foreach (var dir in dirs)
+                            {
+                                if (cur[0] + dir[0] < 0 || cur[0] + dir[0] > m - 1
+                                || cur[1] + dir[1] < 0 || cur[1] + dir[1] > n - 1)
+                                    continue;
+
+                                if (grid[cur[0] + dir[0]][cur[1] + dir[1]] == 1)
+                                {
+
+                                    if (!visited.ContainsKey(new rNode
+                                    (cur[0] + dir[0], cur[1] + dir[1])))
+                                        visited.Add(new rNode(cur[0] + dir[0], cur[1] + dir[1]), false);
+                                    if (!visitedGen.ContainsKey(new rNode
+                                    (cur[0] + dir[0], cur[1] + dir[1])))
+                                        visitedGen.Add(new rNode(cur[0] + dir[0], cur[1] + dir[1]), false);
+                                    if (!distances.ContainsKey(new rNode
+                                        (cur[0] + dir[0], cur[1] + dir[1])))
+                                        distances.Add(new rNode(cur[0] + dir[0], cur[1] + dir[1]), int.MaxValue);
+                                    if (visited[new rNode(cur[0] + dir[0], cur[1] + dir[1])])
+                                        continue;
+                                    var key = new rNode(cur[0] + dir[0], cur[1] + dir[1]);
+                                    if (dict.ContainsKey(key)) dict.Remove(key);
+                                    // grid[cur[0] + dir[0]][cur[1] + dir[1]] = 3;
+                                    q.Enqueue([cur[0] + dir[0], cur[1] + dir[1], cur[2] + 1]);
+                                    visited[new rNode(cur[0] + dir[0], cur[1] + dir[1])] = true;
+                                    var x = new rNode(cur[0] + dir[0], cur[1] + dir[1]);
+                                    visitedGen[new rNode(cur[0] + dir[0], cur[1] + dir[1])] = true;
+                                    distances[new rNode(cur[0] + dir[0], cur[1] + dir[1])] =
+                                        Math.Min(distances[new rNode(cur[0] + dir[0], cur[1] + dir[1])], cur[2] + 1);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            foreach(var pair in dict) if (visitedGen.ContainsKey(pair.Key) && visitedGen[pair.Key]) dict.Remove(pair.Key);
+
+            return dict.Count() > 0 ? -1 : distances.Count > 0 ? distances.Values.Max() : 0;
         }
 
         // https://leetcode.com/problems/max-area-of-island/description/

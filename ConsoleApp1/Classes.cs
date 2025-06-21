@@ -1,4 +1,6 @@
-﻿namespace ConsoleApp1
+﻿using System.Collections.Generic;
+
+namespace ConsoleApp1
 {
     public class ListNode {
         public int val;
@@ -28,6 +30,7 @@
         public Node left;
         public Node right;
         public Node next;
+        public IList<Node> neighbors;
 
         public Node() { }
 
