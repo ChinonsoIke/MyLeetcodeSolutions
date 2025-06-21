@@ -56,6 +56,8 @@ namespace ConsoleApp1
             return newNode;
         }
 
+        // https://leetcode.com/problems/rotting-oranges/submissions/1670945123/
+        // todo: learn multisource bfs
         public int OrangesRotting(int[][] grid)
         {
             int[][] dirs = [[-1, 0], [0, 1], [1, 0], [0, -1]]; // up, right, down, left
