@@ -20,6 +20,35 @@ namespace ConsoleApp1
             Console.WriteLine(app.FindOrder(4, [[1, 0], [2, 0], [3, 1], [3, 2]]));
         }
 
+        // https://leetcode.com/problems/k-closest-points-to-origin/description/
+        public int[][] KClosest(int[][] points, int k)
+        {
+            var pq = new PriorityQueue<int[], double>(Comparer<double>.Create((x, y) => y.CompareTo(x)));
+            for (int i = 0; i < points.Length; i++)
+            {
+                PQAdd(pq, points[i], k);
+            }
+
+            var list = new List<int[]>();
+            while (pq.Count > 0) list.Add(pq.Dequeue());
+            return list.ToArray();
+        }
+
+        public void PQAdd(PriorityQueue<int[], double> pq, int[] coord, int k)
+        {
+            double e = Math.Sqrt(Math.Pow((coord[0] - 0), 2) + Math.Pow((coord[1] - 0), 2));
+            if (pq.Count < k) pq.Enqueue(coord, e);
+            else
+            {
+                pq.TryPeek(out int[] min, out double p);
+                if (e < p)
+                {
+                    pq.Dequeue();
+                    pq.Enqueue(coord, e);
+                }
+            }
+        }
+
         public int[] FindOrder(int numCourses, int[][] prerequisites)
         {
             //build adjacency list
