@@ -17,7 +17,108 @@ namespace ConsoleApp1
             var app = new Program();
             //TreeNode tree1 = app.BuildTree([1, 2, 2, 3, 3, null, null, 4, 4]);
             //int a = 1011_0111, b = ~a;
-            Console.WriteLine(app.OrangesRotting([[2, 1, 1], [0, 1, 1], [1, 0, 1]]));
+            Console.WriteLine(app.FindOrder(4, [[1, 0], [2, 0], [3, 1], [3, 2]]));
+        }
+
+        public int[] FindOrder(int numCourses, int[][] prerequisites)
+        {
+            //build adjacency list
+            //do dfs
+            //if a cycle is found return false
+
+            var adjList = new Dictionary<int, List<int>>();
+            int[] visited = new int[numCourses];
+            var list = new List<int>();
+
+            for (int i = 0; i < numCourses; i++)
+            {
+                adjList.Add(i, new List<int>());
+            }
+            foreach (int[] edge in prerequisites)
+            {
+                if (edge[0] == edge[1]) return [];
+                adjList[edge[1]].Add(edge[0]);
+            }
+
+            var stack = new Stack<int>();
+
+            // graph could be disconnected
+            while (Array.IndexOf(visited, 0) > -1)
+            {
+                stack.Push(Array.IndexOf(visited, 0));
+                visited[Array.IndexOf(visited, 0)] = 1;
+
+                while (stack.Count > 0)
+                {
+                    int course = stack.Peek();
+
+                    bool found = false;
+                    foreach (int c in adjList[course])
+                    {
+                        if (stack.Contains(c)) return [];
+
+                        if (visited[c] == 0)
+                        {
+                            found = true; // we've found a neighbor to add to stack
+                            visited[c] = 1;
+                            stack.Push(c);
+                            break;
+                        }
+                    }
+
+                    if (!found)
+                    {
+                        list.Insert(0, course);
+                        stack.Pop();
+                    }
+                }
+            }
+
+            return list.ToArray();
+        }
+
+        public IList<IList<int>> PacificAtlantic(int[][] heights)
+        {
+            int m = heights.Length, n = heights[0].Length;
+            int[][] dirs = [[-1, 0], [0, 1], [1, 0], [0, -1]]; // up, right, down, left
+            var list = new List<IList<int>>();
+
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    var s = new Stack<int[]>();
+                    var visited = new Dictionary<rNode, int>();
+                    s.Push([i, j]);
+                    bool canFlowPacific = false, canFlowAtlantic = false;
+
+                    while (s.Count() > 0)
+                    {
+                        var cur = s.Pop();
+                        foreach (var dir in dirs)
+                        {
+                            if (cur[0] + dir[0] < 0 || cur[0] + dir[0] > m - 1
+                            || cur[1] + dir[1] < 0 || cur[1] + dir[1] > n - 1)
+                                continue;
+
+                            if (heights[cur[0]][cur[1]] >= heights[cur[0] + dir[0]][cur[1] + dir[1]]
+                                && !visited.ContainsKey(new rNode(cur[0] + dir[0], cur[1] + dir[1])))
+                            {
+                                s.Push([cur[0] + dir[0], cur[1] + dir[1]]);
+                                visited.Add(new rNode(cur[0] + dir[0], cur[1] + dir[1]), 0);
+                                if (cur[0] + dir[0] == 0 || cur[1] + dir[1] == 0) canFlowPacific = true;
+                                if (cur[0] + dir[0] == m - 1 || cur[1] + dir[1] == n - 1) canFlowAtlantic = true;
+                            }
+                        }
+
+                        if (canFlowPacific && canFlowAtlantic) break;
+                    }
+
+                    if (canFlowPacific && canFlowAtlantic) list.Add(new List<int> { i, j });
+                }
+            }
+
+            return list;
         }
 
         // https://leetcode.com/problems/clone-graph/
