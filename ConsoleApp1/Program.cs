@@ -77,6 +77,7 @@ namespace ConsoleApp1
             return list.ToArray();
         }
 
+        // https://leetcode.com/problems/pacific-atlantic-water-flow/
         public IList<IList<int>> PacificAtlantic(int[][] heights)
         {
             int m = heights.Length, n = heights[0].Length;
@@ -91,6 +92,8 @@ namespace ConsoleApp1
                     var visited = new Dictionary<rNode, int>();
                     s.Push([i, j]);
                     bool canFlowPacific = false, canFlowAtlantic = false;
+                    if (i == 0 || j == 0) canFlowPacific = true;
+                    if (i == m - 1 || j == n - 1) canFlowAtlantic = true;
 
                     while (s.Count() > 0)
                     {
