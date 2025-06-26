@@ -27,7 +27,29 @@ namespace ConsoleApp1
             //Console.WriteLine(cache.Get(1)); // Output: -1 (not found)
             //Console.WriteLine(cache.Get(2)); // Output: 3
 
-            //Console.WriteLine(app.FindDuplicate([10,3,4,4]));
+            Console.WriteLine(app.TwoSum([2, 7, 11, 15], 9));
+        }
+
+        // https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/description/
+        public int[] TwoSum(int[] numbers, int target)
+        {
+            for (int i = 0; i < numbers.Length; i++)
+            {
+                int j = BinarySearch2(numbers, target - numbers[i], i + 1, numbers.Length - 1);
+                if (j != -1) return [i + 1, j + 1];
+            }
+
+            return null;
+        }
+
+        public int BinarySearch2(int[] nums, int num, int start, int end)
+        {
+            if (start > end) return -1;
+
+            int mid = (start + end) / 2;
+            if (nums[mid] == num) return mid;
+            else if (nums[mid] > num) return BinarySearch2(nums, num, start, mid - 1);
+            else return BinarySearch2(nums, num, mid + 1, end);
         }
 
         // https://leetcode.com/problems/reorder-list/description/
