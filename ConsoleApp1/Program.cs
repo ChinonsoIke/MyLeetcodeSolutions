@@ -17,7 +17,108 @@ namespace ConsoleApp1
             var app = new Program();
             //TreeNode tree1 = app.BuildTree([1, 2, 2, 3, 3, null, null, 4, 4]);
             //int a = 1011_0111, b = ~a;
-            Console.WriteLine(app.FindOrder(4, [[1, 0], [2, 0], [3, 1], [3, 2]]));
+            //var cache = new LRUCache(2);
+
+            //cache.Put(2, 1);             // cache = {2=1}
+            //cache.Put(1, 1);             // cache = {2=1, 1=1}
+            //cache.Put(2, 3);             // update 2 → {1=1, 2=3}
+            //cache.Put(4, 1);             // evict 1 → {2=3, 4=1}
+
+            //Console.WriteLine(cache.Get(1)); // Output: -1 (not found)
+            //Console.WriteLine(cache.Get(2)); // Output: 3
+
+            //Console.WriteLine(app.FindDuplicate([10,3,4,4]));
+        }
+
+        // https://leetcode.com/problems/reorder-list/description/
+        public void ReorderList(ListNode head)
+        {
+            var list = new List<ListNode>();
+            var cur = head;
+
+            while (cur != null)
+            {
+                list.Add(cur);
+                cur = cur.next;
+            }
+
+            for (int i = 0, j = list.Count - 1; i + 1 < j; i++, j--)
+            {
+                // change next pointer for prev of j node
+                list[j - 1].next = null;
+                // insert j at new position
+                list[i].next = list[j];
+                list[j].next = list[i + 1];
+            }
+        }
+
+
+        public int LeastInterval(char[] tasks, int n)
+        {
+            var dict = new Dictionary<char, int>();
+            var dict2 = new Dictionary<int, int>();
+            PriorityQueue<(char task, int time), int> pq = new PriorityQueue<(char, int), int>();
+            var pq2 = new PriorityQueue<char, int>(Comparer<int>.Create((x, y) => y.CompareTo(x)));
+            int min = 0;
+            int k = min;
+            // int t = 0, extra = 0;
+
+            foreach (char c in tasks)
+            {
+                if (!dict.ContainsKey(c))
+                {
+                    dict.Add(c, 0);
+                    // pq.Enqueue((c,k), k);
+                    // Console.WriteLine($"{c}-{k}");
+                    // k++;
+                }
+                else dict[c]++;
+            }
+
+            foreach (var item in dict)
+            {
+                pq2.Enqueue(item.Key, item.Value);
+            }
+
+            while (pq2.Count > 0)
+            {
+                pq2.TryPeek(out char c, out int f);
+                pq2.Dequeue();
+
+                while (dict2.ContainsKey(min + 1))
+                {
+                    min++;
+                }
+                min++;
+                pq.Enqueue((c, min), min);
+                dict2.Add(min, min);
+                f--;
+                k = min;
+
+                while (f > 0)
+                {
+                    k = k + n + 1;
+                    pq.Enqueue((c, k), k);
+                    dict2.Add(k, k);
+                    f--;
+                }
+            }
+
+            // while(pq.Count > 0){
+            //     var cur = pq.Dequeue();
+            //     // Console.WriteLine($"{cur.task}-{cur.time}");
+            //     t = cur.time;
+            //     if(dict2.ContainsKey(t)) extra++;
+            //     else dict2.Add(t,0);
+
+            //     if(dict[cur.task] > 0){
+            //         pq.Enqueue((cur.task,cur.time+n+1), cur.time+n+1);
+            //         dict[cur.task]--;
+            //     }
+            // }
+
+            // Console.WriteLine($"{t}-{extra}");
+            return k;
         }
 
         // https://leetcode.com/problems/k-closest-points-to-origin/description/
