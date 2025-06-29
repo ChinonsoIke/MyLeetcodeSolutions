@@ -30,6 +30,28 @@ namespace ConsoleApp1
             Console.WriteLine(app.TwoSum([2, 7, 11, 15], 9));
         }
 
+        // https://leetcode.com/problems/binary-tree-right-side-view/description/
+        public IList<int> RightSideView(TreeNode root)
+        {
+            var list = new List<int>();
+            if (root == null) return list;
+
+            var q = new Queue<(TreeNode node, int level)>();
+            q.Enqueue((root, 1));
+
+            while (q.Count() > 0)
+            {
+                var cur = q.Dequeue();
+
+                if (q.Count() == 0 || q.Peek().level > cur.level)
+                    list.Add(cur.node.val);
+                if (cur.node.left != null) q.Enqueue((cur.node.left, cur.level + 1));
+                if (cur.node.right != null) q.Enqueue((cur.node.right, cur.level + 1));
+            }
+
+            return list;
+        }
+
         // https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/description/
         public TreeNode LowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q)
         {
