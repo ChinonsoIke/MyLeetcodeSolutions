@@ -30,6 +30,36 @@ namespace ConsoleApp1
             Console.WriteLine(app.TwoSum([2, 7, 11, 15], 9));
         }
 
+        // https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/description/
+        public TreeNode LowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q)
+        {
+            List<TreeNode> pParents = new(), qParents = new();
+
+            dfs(root, p.val, pParents);
+            dfs(root, q.val, qParents);
+
+            foreach (var node in pParents)
+            {
+                if (qParents.IndexOf(node) > -1) return node;
+            }
+
+            return null;
+        }
+
+        public bool dfs(TreeNode root, int val, List<TreeNode> parents)
+        {
+            if (root == null) return false;
+            if (root.val == val)
+            {
+                parents.Add(root);
+                return true;
+            }
+
+            bool l = dfs(root.left, val, parents), r = dfs(root.right, val, parents);
+            if (l || r) parents.Add(root);
+            return l || r;
+        }
+
         // https://leetcode.com/problems/count-good-nodes-in-binary-tree/description/
         public int GoodNodes(TreeNode root)
         {
