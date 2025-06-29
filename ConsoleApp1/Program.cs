@@ -30,6 +30,28 @@ namespace ConsoleApp1
             Console.WriteLine(app.TwoSum([2, 7, 11, 15], 9));
         }
 
+        // https://leetcode.com/problems/kth-largest-element-in-an-array/description/
+        public int FindKthLargest(int[] nums, int k)
+        {
+            var pq = new PriorityQueue<int, int>();
+
+            for (int i = 0; i < nums.Length; i++)
+            {
+                PQAdd(pq, nums[i], k);
+            }
+            return pq.Peek();
+        }
+
+        public void PQAdd(PriorityQueue<int, int> pq, int num, int k)
+        {
+            if (pq.Count < k) pq.Enqueue(num, num);
+            else if (num > pq.Peek())
+            {
+                pq.Dequeue();
+                pq.Enqueue(num, num);
+            }
+        }
+
         // https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/description/
         public int[] TwoSum(int[] numbers, int target)
         {
