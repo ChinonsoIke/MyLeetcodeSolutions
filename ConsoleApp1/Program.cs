@@ -30,6 +30,29 @@ namespace ConsoleApp1
             Console.WriteLine(app.TwoSum([2, 7, 11, 15], 9));
         }
 
+        // https://leetcode.com/problems/count-good-nodes-in-binary-tree/description/
+        public int GoodNodes(TreeNode root)
+        {
+            return dfs(root, 0, int.MinValue);
+        }
+
+        public int dfs(TreeNode root, int count, int max)
+        {
+            if (root == null)
+            {
+                max = int.MinValue;
+                return count;
+            }
+
+            if (root.val >= max)
+            {
+                max = root.val;
+                count++;
+            }
+
+            return dfs(root.right, dfs(root.left, count, max), max);
+        }
+
         // https://leetcode.com/problems/kth-largest-element-in-an-array/description/
         public int FindKthLargest(int[] nums, int k)
         {
