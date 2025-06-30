@@ -27,7 +27,7 @@ namespace ConsoleApp1
             //Console.WriteLine(cache.Get(1)); // Output: -1 (not found)
             //Console.WriteLine(cache.Get(2)); // Output: 3
 
-            Console.WriteLine(app.TwoSum([2, 7, 11, 15], 9));
+            //Console.WriteLine(app.TwoSum([2, 7, 11, 15], 9));
         }
 
         // https://leetcode.com/problems/binary-tree-right-side-view/description/
