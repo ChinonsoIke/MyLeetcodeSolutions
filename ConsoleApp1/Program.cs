@@ -30,6 +30,32 @@ namespace ConsoleApp1
             //Console.WriteLine(app.TwoSum([2, 7, 11, 15], 9));
         }
 
+        // https://leetcode.com/problems/longest-substring-without-repeating-characters/description/
+        public int LengthOfLongestSubstring(string s)
+        {
+            if (string.IsNullOrEmpty(s)) return 0;
+
+            int max = int.MinValue, start = 0, end = 0;
+            var list = new List<char>();
+
+            while (end < s.Length)
+            {
+                if (!list.Contains(s[end]))
+                {
+                    list.Add(s[end]);
+                    max = Math.Max(max, list.Count);
+                    end++;
+                }
+                else
+                {
+                    list.RemoveAt(0);
+                    start++;
+                }
+            }
+
+            return max;
+        }
+
         // https://leetcode.com/problems/binary-tree-right-side-view/description/
         public IList<int> RightSideView(TreeNode root)
         {
