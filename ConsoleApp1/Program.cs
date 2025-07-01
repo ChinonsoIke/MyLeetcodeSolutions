@@ -30,6 +30,31 @@ namespace ConsoleApp1
             //Console.WriteLine(app.TwoSum([2, 7, 11, 15], 9));
         }
 
+        // https://leetcode.com/problems/product-of-array-except-self/description/
+        public int[] ProductExceptSelf(int[] nums)
+        {
+            int prev = 1;
+            int[] arr = new int[nums.Length];
+
+            // compute all the forward products for each element
+            // eg [1,2,3,4] => [24,12,4,1]
+            for (int i = nums.Length - 1; i >= 0; i--)
+            {
+                if (i == nums.Length - 1) arr[i] = 1;
+                else arr[i] = arr[i + 1] * nums[i + 1];
+            }
+
+            // calculate previous products going forward and multiply by the forwards
+            // eg [24,12,4,1] => [24,12,8,6]
+            for (int i = 0; i < nums.Length; i++)
+            {
+                arr[i] *= prev;
+                prev *= nums[i];
+            }
+
+            return arr;
+        }
+
         // https://leetcode.com/problems/longest-substring-without-repeating-characters/description/
         public int LengthOfLongestSubstring(string s)
         {
