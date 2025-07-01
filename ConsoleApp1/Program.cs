@@ -846,32 +846,6 @@ namespace ConsoleApp1
             return temp;
         }
 
-        public int LengthOfLongestSubstring(string s)
-        {
-            if (string.IsNullOrEmpty(s)) return 0;
-
-            int max = int.MinValue;
-            var set = new HashSet<char>();
-            for (int i = 0; i < s.Length; i++)
-            {
-                var sub = s.Substring(i);
-                for (int j = 0; j < sub.Length - 1; j++)
-                {
-                    int size = set.Count();
-                    set.Add(sub[j]);
-                    if (set.Count == size)
-                    {
-                        max = Math.Max(max, size);
-                        set.Clear();
-                        break;
-                    }
-                }
-                max = Math.Max(max, set.Count());
-            }
-
-            return max;
-        }
-
         // https://leetcode.com/problems/count-and-say/description/
         public string CountAndSay(int n)
         {
