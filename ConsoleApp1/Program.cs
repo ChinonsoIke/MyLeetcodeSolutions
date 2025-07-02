@@ -30,6 +30,35 @@ namespace ConsoleApp1
             //Console.WriteLine(app.TwoSum([2, 7, 11, 15], 9));
         }
 
+        // https://leetcode.com/problems/search-in-rotated-sorted-array/
+        public int SearchRotated(int[] nums, int target)
+        {
+            int k = 0;
+            if (nums[0] > nums[nums.Length - 1]) k = binarySearchK(nums, 0, nums.Length - 1, nums.Length - 1);
+
+            return binarySearch(nums, target, 0, nums.Length - 1, k);
+        }
+
+        public int binarySearch(int[] nums, int target, int start, int end, int k)
+        {
+            if (start > end) return -1;
+
+            int mid = (start + end) / 2;
+            if (nums[mid] == target) return mid;
+
+            if (nums[mid] > target)
+            {
+                if (mid <= k && nums[start] > target) return binarySearch(nums, target, mid + 1, end, k);
+                return binarySearch(nums, target, start, mid - 1, k);
+            }
+            else
+            {
+                if (k <= mid && nums[end] < target) return binarySearch(nums, target, start, mid - 1, k);
+
+                return binarySearch(nums, target, mid + 1, end, k);
+            }
+        }
+
         // https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/description/
         public int FindMin(int[] nums)
         {
