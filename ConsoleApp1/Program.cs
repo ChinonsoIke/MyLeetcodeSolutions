@@ -30,6 +30,25 @@ namespace ConsoleApp1
             //Console.WriteLine(app.TwoSum([2, 7, 11, 15], 9));
         }
 
+        // https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/description/
+        public int FindMin(int[] nums)
+        {
+            int k = 0;
+            if (nums[0] > nums[nums.Length - 1]) k = binarySearchK(nums, 0, nums.Length - 1, nums.Length - 1);
+            return nums[k];
+        }
+
+        public int binarySearchK(int[] nums, int start, int end, int min)
+        {
+            if (start > end) return min;
+
+            int mid = (start + end) / 2;
+
+            if (nums[mid] < nums[min]) min = mid;
+            if (nums[mid] > nums[min]) return binarySearchK(nums, mid + 1, end, min);
+            return binarySearchK(nums, start, mid - 1, min);
+        }
+
         // https://leetcode.com/problems/search-a-2d-matrix/description/
         public bool SearchMatrix(int[][] matrix, int target)
         {
