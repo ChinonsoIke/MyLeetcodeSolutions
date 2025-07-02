@@ -30,6 +30,34 @@ namespace ConsoleApp1
             //Console.WriteLine(app.TwoSum([2, 7, 11, 15], 9));
         }
 
+        // https://leetcode.com/problems/search-a-2d-matrix/description/
+        public bool SearchMatrix(int[][] matrix, int target)
+        {
+            return binarySearchMat(matrix, target, 0, matrix.Length - 1);
+        }
+
+        public bool binarySearchMat(int[][] mat, int target, int start, int end)
+        {
+            if (start > end) return false;
+
+            int mid = (start + end) / 2;
+
+            if (mat[mid][0] <= target && mat[mid][mat[mid].Length - 1] >= target) return binarySearch2(mat[mid], target, 0, mat[mid].Length - 1);
+            if (mat[mid][0] > target) return binarySearchMat(mat, target, start, mid - 1);
+            return binarySearchMat(mat, target, mid + 1, end);
+        }
+
+        public bool binarySearch2(int[] nums, int target, int start, int end)
+        {
+            if (start > end) return false;
+
+            int mid = (start + end) / 2;
+
+            if (nums[mid] == target) return true;
+            if (nums[mid] > target) return binarySearch2(nums, target, start, mid - 1);
+            return binarySearch2(nums, target, mid + 1, end);
+        }
+
         // https://leetcode.com/problems/product-of-array-except-self/description/
         public int[] ProductExceptSelf(int[] nums)
         {
