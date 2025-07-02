@@ -30,6 +30,35 @@ namespace ConsoleApp1
             //Console.WriteLine(app.TwoSum([2, 7, 11, 15], 9));
         }
 
+        // https://leetcode.com/problems/copy-list-with-random-pointer/description/
+        /*public Node CopyRandomList(Node head)
+        {
+            if (head == null) return null;
+
+            var dict = new Dictionary<Node, Node>();
+            dict.Add(head, new Node(head.val));
+            Node cur = dict[head], ogCur = head;
+
+            while (cur != null)
+            {
+                if (ogCur.next != null)
+                {
+                    if (!dict.ContainsKey(ogCur.next)) dict.Add(ogCur.next, new Node(ogCur.next.val));
+                    cur.next = dict[ogCur.next];
+                }
+                if (ogCur.random != null)
+                {
+                    if (!dict.ContainsKey(ogCur.random)) dict.Add(ogCur.random, new Node(ogCur.random.val));
+                    cur.random = dict[ogCur.random];
+                }
+
+                cur = cur.next;
+                ogCur = ogCur.next;
+            }
+
+            return dict[head];
+        }*/
+
         // https://leetcode.com/problems/search-in-rotated-sorted-array/
         public int SearchRotated(int[] nums, int target)
         {
