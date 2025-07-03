@@ -12,6 +12,9 @@ namespace ConsoleApp1
     internal class Program
     {
         public record struct rNode(int i, int j);
+
+        int max = int.MinValue;
+
         static async Task Main(string[] args)
         {
             var app = new Program();
@@ -29,6 +32,29 @@ namespace ConsoleApp1
 
             var list = BuildList(new int[] { 1, 2, 3, 4, 5 });
             Console.WriteLine(app.ReverseKGroup(list, 2));
+        }
+
+        // https://leetcode.com/problems/binary-tree-maximum-path-sum/
+        public int MaxPathSum(TreeNode root)
+        {
+            dfs(root);
+            return max;
+        }
+
+        public int dfs(TreeNode root)
+        {
+            if (root == null) return 0;
+
+            int left = dfs(root.left), right = dfs(root.right), self = root.val;
+
+            int maxSum = Math.Max(self, self + left);
+            maxSum = Math.Max(maxSum, self + right);
+
+            // checking if this could be max path sum
+            int temp = Math.Max(maxSum, self + left + right);
+            max = Math.Max(max, temp);
+
+            return maxSum;
         }
 
         // https://leetcode.com/problems/reverse-nodes-in-k-group/description/
