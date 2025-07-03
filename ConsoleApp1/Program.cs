@@ -27,7 +27,58 @@ namespace ConsoleApp1
             //Console.WriteLine(cache.Get(1)); // Output: -1 (not found)
             //Console.WriteLine(cache.Get(2)); // Output: 3
 
-            //Console.WriteLine(app.TwoSum([2, 7, 11, 15], 9));
+            var list = BuildList(new int[] { 1, 2, 3, 4, 5 });
+            Console.WriteLine(app.ReverseKGroup(list, 2));
+        }
+
+        // https://leetcode.com/problems/reverse-nodes-in-k-group/description/
+        public ListNode ReverseKGroup(ListNode head, int k)
+        {
+            ListNode slow = head, fast = head, newHead = null;
+
+            for (int i = 0; i < k - 1 && fast != null; i++)
+            {
+                fast = fast.next;
+            }
+            if (fast == null) return head;
+            ListNode prevTail = null;
+
+            while (fast != null)
+            {
+                ListNode prev = null, tail = null;
+                while (slow != tail?.next)
+                {
+                    var temp = slow.next;
+                    slow.next = prev == null ? fast.next : prev;
+                    tail = prev == null ? slow : tail;
+                    prev = slow;
+                    slow = temp;
+                }
+                fast = tail.next;
+                if (prevTail != null) prevTail.next = prev;
+                prevTail = tail;
+
+                if (newHead == null) newHead = prev;
+
+                for (int i = 0; i < k - 1 && fast != null; i++)
+                {
+                    fast = fast.next;
+                }
+            }
+
+            return newHead;
+        }
+
+        public static ListNode BuildList(int[] values)
+        {
+            ListNode dummy = new ListNode(0);
+            ListNode current = dummy;
+            foreach (int val in values)
+            {
+                current.next = new ListNode(val);
+                current = current.next;
+            }
+            return dummy.next;
         }
 
         // https://leetcode.com/problems/merge-k-sorted-lists/description/
