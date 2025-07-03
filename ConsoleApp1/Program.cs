@@ -30,6 +30,35 @@ namespace ConsoleApp1
             //Console.WriteLine(app.TwoSum([2, 7, 11, 15], 9));
         }
 
+        // https://leetcode.com/problems/merge-k-sorted-lists/description/
+        public ListNode MergeKLists(ListNode[] lists)
+        {
+            if (lists == null || lists.Length == 0) return null;
+
+            var pq = new PriorityQueue<ListNode, int>();
+            foreach (var node in lists)
+            {
+                var curr = node;
+                while (curr != null)
+                {
+                    pq.Enqueue(curr, curr.val);
+                    curr = curr.next;
+                }
+            }
+
+            if (pq.Count == 0) return null;
+
+            ListNode head = pq.Dequeue(), cur = head;
+            while (pq.Count > 0)
+            {
+                cur.next = pq.Dequeue();
+                cur = cur.next;
+            }
+            cur.next = null;
+
+            return head;
+        }
+
         // https://leetcode.com/problems/copy-list-with-random-pointer/description/
         /*public Node CopyRandomList(Node head)
         {
