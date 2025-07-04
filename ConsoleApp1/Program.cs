@@ -34,6 +34,60 @@ namespace ConsoleApp1
             Console.WriteLine(app.ReverseKGroup(list, 2));
         }
 
+        // https://leetcode.com/problems/serialize-and-deserialize-binary-tree/
+        // Encodes a tree to a single string.
+        public string serialize(TreeNode root)
+        {
+            if (root == null) return null;
+
+            // var list = new List<string>();
+            var sb = new StringBuilder();
+            var q = new Queue<TreeNode>();
+            q.Enqueue(root);
+
+            while (q.Count > 0)
+            {
+                var cur = q.Dequeue();
+                sb.Append("," + (cur != null ? cur.val.ToString() : "null"));
+
+                if (cur != null)
+                {
+                    q.Enqueue(cur?.left);
+                    q.Enqueue(cur?.right);
+                }
+            }
+
+            return sb.ToString().Substring(1);
+        }
+
+        // Decodes your encoded data to tree.
+        public TreeNode deserialize(string data)
+        {
+            if (string.IsNullOrEmpty(data)) return null;
+            var arr = data.Split(",");
+            TreeNode root = new TreeNode(int.Parse(arr[0]));
+            var q = new Queue<TreeNode>();
+            q.Enqueue(root);
+            int i = 0;
+
+            while (q.Count > 0)
+            {
+                var cur = q.Dequeue();
+
+                if (cur != null)
+                {
+                    string left = arr[++i], right = arr[++i];
+                    cur.left = left != "null" ? new TreeNode(int.Parse(left)) : null;
+                    cur.right = right != "null" ? new TreeNode(int.Parse(right)) : null;
+
+                    q.Enqueue(cur.left);
+                    q.Enqueue(cur.right);
+                }
+            }
+
+            return root;
+        }
+
         // https://leetcode.com/problems/binary-tree-maximum-path-sum/
         public int MaxPathSum(TreeNode root)
         {
