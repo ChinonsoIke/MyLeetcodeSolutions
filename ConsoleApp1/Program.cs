@@ -34,6 +34,35 @@ namespace ConsoleApp1
             Console.WriteLine(app.ReverseKGroup(list, 2));
         }
 
+        // https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/
+        public TreeNode BuildTree(int[] preorder, int[] inorder)
+        {
+            int i = 0;
+            return Build(preorder, inorder, 0, inorder.Length - 1, ref i);
+        }
+
+        public TreeNode Build(int[] preorder, int[] inorder, int start, int end, ref int i)
+        {
+            if (start == end) return new TreeNode(inorder[start]);
+            if (start > end) return null;
+
+            TreeNode node = null;
+            for (int j = start; j <= end; j++)
+            {
+                if (inorder[j] == preorder[i])
+                {
+                    node = new TreeNode(inorder[j]);
+                    i = j - 1 >= start ? i + 1 : i;
+                    node.left = Build(preorder, inorder, start, j - 1, ref i);
+                    i = j + 1 <= end ? i + 1 : i;
+                    node.right = Build(preorder, inorder, j + 1, end, ref i);
+                    break;
+                }
+            }
+
+            return node;
+        }
+
         // https://leetcode.com/problems/serialize-and-deserialize-binary-tree/
         // Encodes a tree to a single string.
         public string serialize(TreeNode root)
