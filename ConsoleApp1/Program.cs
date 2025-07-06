@@ -14,6 +14,7 @@ namespace ConsoleApp1
         public record struct rNode(int i, int j);
 
         int max = int.MinValue;
+        List<(TreeNode, int)> list = new List<(TreeNode, int)>();
 
         static async Task Main(string[] args)
         {
@@ -30,8 +31,116 @@ namespace ConsoleApp1
             //Console.WriteLine(cache.Get(1)); // Output: -1 (not found)
             //Console.WriteLine(cache.Get(2)); // Output: 3
 
-            var list = BuildList(new int[] { 1, 2, 3, 4, 5 });
-            Console.WriteLine(app.ReverseKGroup(list, 2));
+            //var tree = app.BuildTree2(new int?[] { 1, 2, 3, 4, 5, 6 });
+            //app.dfs2(tree, 0);
+            Console.WriteLine(app.Exist([['A', 'B', 'C', 'E'], ['S', 'F', 'C', 'S'], ['A', 'D', 'E', 'E']], "ABCCED"));
+        }
+
+        int[][] dirs = [[-1, 0], [0, 1], [1, 0], [0, -1]]; // up, right, down, left
+
+        // --optimization fixes--
+        // changed sb to int count
+        // changed dfs to bool return and stopped when found
+        // switched from using visited dictionary to markers
+        // passed pos as ints i and j instead of array
+        // did reverse heuristic search
+        // https://leetcode.com/problems/word-search/
+
+        public bool Exist(char[][] board, string word)
+        {
+            int m = board.Length, n = board[0].Length, countStart = 0, countEnd = 0;
+
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    if (board[i][j] == word[0]) countStart++;
+                    if (board[i][j] == word[word.Length - 1]) countEnd++;
+                }
+            }
+
+            if (countEnd < countStart)
+            {
+                var sb = new StringBuilder();
+                for (int i = word.Length - 1; i >= 0; i--) sb.Append(word[i]);
+                word = sb.ToString();
+            }
+
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    if (board[i][j] == word[0])
+                    {
+                        char temp = board[i][j];
+                        board[i][j] = '#';
+                        bool exists = dfs(board, i, j, 1, word);
+                        if (exists) return true;
+                        board[i][j] = temp;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public bool dfs(char[][] board, int i, int j, int count, string word)
+        {
+            if (count == word.Length) return true;
+            int size = count;
+
+            foreach (int[] dir in dirs)
+            {
+                int y = i + dir[0], x = j + dir[1];
+                if (x < 0 || y < 0 || y >= board.Length || x >= board[0].Length) continue;
+
+                if (board[y][x] == word[count])
+                {
+                    char temp = board[y][x];
+                    board[y][x] = '#';
+                    bool check = dfs(board, y, x, count + 1, word);
+                    if (check) return true;
+                    board[y][x] = temp;
+                }
+            }
+
+            // didn't go anywhere
+            return false;
+        }
+
+        public int dfs2(TreeNode root, int level)
+        {
+            if(root.left == null && root.right == null) return 0;
+
+            int left = -1, right = -1; 
+            if (root.left != null) left = dfs2(root.left, level + 1);
+            if (root.right != null) right = dfs2(root.right, level+1);
+
+            if(left == 0 || right == 0) list.Add((root, level));
+            return level;
+        }
+
+        public void do1(int[] nums)
+        {
+            for (int i = 0; i < nums.Length; i++) // n*n
+            {
+                for(int j = 0; j < nums.Length; j++)
+                {
+
+                }
+            }
+        }
+
+        public void do2(int[] nums)
+        {
+            for (int i = 0; i < nums.Length; i++) // n+n = n O(n)
+            {
+            }
+
+            for (int i = 0; i < nums.Length; i++)
+            {
+
+            }
         }
 
         // https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/
@@ -2899,7 +3008,7 @@ namespace ConsoleApp1
             return false;
         }
 
-        public TreeNode BuildTree(int?[] values)
+        public TreeNode BuildTree2(int?[] values)
         {
             if (values == null || values.Length == 0 || values[0] == null)
                 return null;
