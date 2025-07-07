@@ -36,6 +36,71 @@ namespace ConsoleApp1
             Console.WriteLine(app.Exist([['A', 'B', 'C', 'E'], ['S', 'F', 'C', 'S'], ['A', 'D', 'E', 'E']], "ABCCED"));
         }
 
+        //https://leetcode.com/problems/redundant-connection/description/
+        public int[] FindRedundantConnection(int[][] edges)
+        {
+            var adjList = new Dictionary<int, List<int>>();
+            var reds = new List<int[]>();
+
+            foreach (var edge in edges)
+            {
+                if (!adjList.ContainsKey(edge[0])) adjList.Add(edge[0], new List<int> { edge[1] });
+                else adjList[edge[0]].Add(edge[1]);
+                if (!adjList.ContainsKey(edge[1])) adjList.Add(edge[1], new List<int> { edge[0] });
+                else adjList[edge[1]].Add(edge[0]);
+            }
+
+            bool[] visited = new bool[adjList.Count + 1];
+            visited[1] = true;
+
+            dfs(1, 0, reds, visited, adjList);
+
+            int lastIndex = 0, i = 0, j = 0;
+            foreach (var red in reds)
+            {
+                for (int k = edges.Length - 1; k >= 0; k--)
+                {
+                    if (edges[k][0] == red[0] && edges[k][1] == red[1] && k > lastIndex)
+                    {
+                        i = red[0];
+                        j = red[1];
+                        lastIndex = k;
+                    }
+                }
+            }
+
+            return [i, j];
+        }
+
+        int dfs(int root, int parent, List<int[]> reds, bool[] visited, Dictionary<int, List<int>> adjList)
+        {
+            foreach (int node in adjList[root])
+            {
+                if (node != parent && visited[node])
+                { // cycle found
+                    reds.Add([Math.Min(root, node), Math.Max(root, node)]);
+                    reds.Add([Math.Min(root, parent), Math.Max(root, parent)]);
+
+                    return node;
+                }
+
+                if (!visited[node])
+                {
+                    visited[node] = true;
+                    int check = dfs(node, root, reds, visited, adjList);
+                    if (check > 0)
+                    {
+                        if (root == check) return 0;
+                        reds.Add([Math.Min(root, parent), Math.Max(root, parent)]);
+                        return check;
+                    }
+                    if (check == 0) return 0;
+                }
+            }
+
+            return -1;
+        }
+
         int[][] dirs = [[-1, 0], [0, 1], [1, 0], [0, -1]]; // up, right, down, left
 
         // --optimization fixes--
