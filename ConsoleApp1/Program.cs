@@ -36,6 +36,42 @@ namespace ConsoleApp1
             Console.WriteLine(app.Exist([['A', 'B', 'C', 'E'], ['S', 'F', 'C', 'S'], ['A', 'D', 'E', 'E']], "ABCCED"));
         }
 
+        // https://leetcode.com/problems/word-ladder/
+        public int LadderLength(string beginWord, string endWord, IList<string> wordList)
+        {
+            var q = new Queue<(string s, int l)>();
+            q.Enqueue((beginWord, 1));
+
+            while (q.Count > 0)
+            {
+                var cur = q.Dequeue();
+                if (cur.s == endWord) return cur.l;
+
+                for (int i = 0; i < wordList.Count; i++)
+                {
+                    if (wordList[i] == "#" || wordList[i] == beginWord) continue; // visited
+                    int diff = 0;
+
+                    for (int j = 0; j < cur.s.Length; j++)
+                    {
+                        if (cur.s[j] != wordList[i][j])
+                        {
+                            diff++;
+                            if (diff == 2) break;
+                        }
+                    }
+
+                    if (diff == 1)
+                    {
+                        q.Enqueue((wordList[i], cur.l + 1));
+                        wordList[i] = "#";
+                    }
+                }
+            }
+
+            return 0;
+        }
+
         //https://leetcode.com/problems/redundant-connection/description/
         public int[] FindRedundantConnection(int[][] edges)
         {
