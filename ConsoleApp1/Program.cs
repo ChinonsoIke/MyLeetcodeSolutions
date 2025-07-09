@@ -36,6 +36,52 @@ namespace ConsoleApp1
             Console.WriteLine(app.Exist([['A', 'B', 'C', 'E'], ['S', 'F', 'C', 'S'], ['A', 'D', 'E', 'E']], "ABCCED"));
         }
 
+        // https://leetcode.com/problems/network-delay-time/description/
+        public int NetworkDelayTime(int[][] times, int n, int k)
+        {
+            bool[] visited = new bool[n + 1];
+            int[] distances = new int[n + 1];
+            var adjList = new Dictionary<int, List<(int node, int weight)>>();
+
+            for (int i = 0; i < distances.Length; i++) distances[i] = int.MaxValue;
+            for (int i = 0; i < times.Length; i++)
+            {
+                if (!adjList.ContainsKey(times[i][0])) adjList.Add(times[i][0], new List<(int, int)> { (times[i][1], times[i][2]) });
+                else adjList[times[i][0]].Add((times[i][1], times[i][2]));
+                if (!adjList.ContainsKey(times[i][1])) adjList.Add(times[i][1], new List<(int, int)>());
+            }
+
+            distances[k] = 0;
+            var pq = new PriorityQueue<int, int>();
+            pq.Enqueue(k, distances[k]);
+
+            while (pq.Count > 0)
+            {
+                var cur = pq.Dequeue();
+
+                if (visited[cur]) continue;
+                visited[cur] = true;
+
+                foreach (var item in adjList[cur])
+                {
+                    if (!visited[item.node] && distances[cur] + item.weight < distances[item.node])
+                    {
+                        distances[item.node] = distances[cur] + item.weight;
+                        pq.Enqueue(item.node, distances[item.node]);
+                    }
+                }
+            }
+
+            int time = int.MinValue;
+            for (int i = 1; i < distances.Length; i++)
+            {
+                if (distances[i] == int.MaxValue) return -1;
+                time = Math.Max(time, distances[i]);
+            }
+
+            return time;
+        }
+
         // https://leetcode.com/problems/word-ladder/
         public int LadderLength(string beginWord, string endWord, IList<string> wordList)
         {
