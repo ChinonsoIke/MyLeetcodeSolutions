@@ -36,6 +36,108 @@ namespace ConsoleApp1
             Console.WriteLine(app.Exist([['A', 'B', 'C', 'E'], ['S', 'F', 'C', 'S'], ['A', 'D', 'E', 'E']], "ABCCED"));
         }
 
+        // https://leetcode.com/problems/merge-triplets-to-form-target-triplet/
+        public bool MergeTriplets(int[][] triplets, int[] target)
+        {
+            var list = new List<int[]>();
+
+            foreach (var num in triplets)
+            {
+                if (num[0] == target[0] && num[1] == target[1] && num[2] == target[2])
+                    return true;
+                if (num[0] == target[0] || num[1] == target[1] || num[2] == target[2])
+                    list.Add(num);
+            }
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                for (int j = i + 1; j < list.Count; j++)
+                {
+                    bool go = true;
+                    int[] temp = new int[3];
+
+                    for (int k = 0; k < list[i].Length; k++)
+                    {
+                        int max = Math.Max(list[i][k], list[j][k]);
+                        if (max > target[k])
+                        {
+                            go = false;
+                            break;
+                        }
+
+                        temp[k] = max;
+                    }
+
+                    if (!go) continue;
+
+                    list[i][0] = temp[0];
+                    list[i][1] = temp[1];
+                    list[i][2] = temp[2];
+
+                    if (list[i][0] == target[0] && list[i][1] == target[1] && list[i][2] == target[2])
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        public int FindCheapestPrice(int n, int[][] flights, int src, int dst, int k)
+        {
+            bool[] visited = new bool[n];
+            int[] distances = new int[n];
+            int[] distancesL = new int[n];
+            var adjList = new Dictionary<int, List<(int node, int cost)>>();
+
+            for (int i = 0; i < distances.Length; i++)
+            {
+                distances[i] = int.MaxValue;
+                distancesL[i] = int.MaxValue;
+            }
+            foreach (var flight in flights)
+            {
+                if (!adjList.ContainsKey(flight[0])) adjList.Add(flight[0], new List<(int node, int cost)> { (flight[1], flight[2]) });
+                else adjList[flight[0]].Add((flight[1], flight[2]));
+                if (!adjList.ContainsKey(flight[1])) adjList.Add(flight[1], new List<(int node, int cost)>());
+            }
+
+            distances[src] = 0;
+            distancesL[src] = 0;
+            var pq = new PriorityQueue<(int node, int level), int>();
+            pq.Enqueue((src, 0), 0);
+            int min = int.MaxValue;
+
+            while (pq.Count > 0)
+            {
+                var cur = pq.Dequeue();
+
+                if (cur.node == dst && cur.level <= k + 1)
+                {
+                    // Console.WriteLine($"{cur.node},{cur.level}");
+                    min = Math.Min(min, distances[cur.node]);
+                }
+
+                if (visited[cur.node]) continue;
+                visited[cur.node] = true;
+
+                foreach (var neighbor in adjList[cur.node])
+                {
+                    if (distancesL[cur.node] + 1 <= distancesL[neighbor.node])
+                    {
+                        // Console.WriteLine($"{cur}->{neighbor.node}");
+                        distancesL[neighbor.node] = distancesL[cur.node] + 1;
+                        if (distances[cur.node] + neighbor.cost < distances[neighbor.node])
+                        {
+                            distances[neighbor.node] = distances[cur.node] + neighbor.cost;
+                        }
+                        pq.Enqueue((neighbor.node, distancesL[neighbor.node]), distancesL[neighbor.node]);
+                    }
+                }
+            }
+
+            return min < int.MaxValue ? min : -1;
+        }
+
         // https://leetcode.com/problems/network-delay-time/description/
         public int NetworkDelayTime(int[][] times, int n, int k)
         {
