@@ -33,7 +33,65 @@ namespace ConsoleApp1
 
             //var tree = app.BuildTree2(new int?[] { 1, 2, 3, 4, 5, 6 });
             //app.dfs2(tree, 0);
-            Console.WriteLine(app.Exist([['A', 'B', 'C', 'E'], ['S', 'F', 'C', 'S'], ['A', 'D', 'E', 'E']], "ABCCED"));
+            Console.WriteLine(app.LengthOfLIS([-2,-1]));
+        }
+
+        // https://leetcode.com/problems/longest-increasing-subsequence/
+        public int LengthOfLIS(int[] nums)
+        {
+            int max = 1;
+            int[] memo = new int[nums.Length];
+
+            for (int i = 0; i < nums.Length; i++)
+            {
+                max = Math.Max(max, dfs(nums, i, memo));
+            }
+
+            return max;
+        }
+
+        public int dfs(int[] nums, int start, int[] memo)
+        {
+            if (memo[start] > 0) return memo[start];
+
+            int max = 1;
+            for (int i = start + 1; i < nums.Length; i++)
+            {
+                if (nums[i] > nums[start])
+                {
+                    max = Math.Max(max, 1 + dfs(nums, i, memo));
+                }
+            }
+
+            memo[start] = max;
+            return max;
+        }
+
+        public int[][] Insert(int[][] intervals, int[] newInterval)
+        {
+            if (intervals.Length == 0) return [newInterval];
+
+            var list = intervals.ToList();
+            list.Add(newInterval);
+            list.Sort(Comparer<int[]>.Create((a, b) => a[0].CompareTo(b[0])));
+
+            for (int i = 1; i < list.Count; i++)
+            {
+                // Console.WriteLine($"{string.Join(",",intervals[i])} vs {string.Join(",",list[n-1])}");
+                if (list[i][0] > list[list.Count - 1][1] && list[i][1] > list[list.Count - 1][1])
+                {
+                    continue;
+                }
+                else
+                {
+                    list[list.Count - 1][0] = Math.Min(list[list.Count - 1][0], intervals[i][0]);
+                    list[list.Count - 1][1] = Math.Max(list[list.Count - 1][1], intervals[i][1]);
+                    list.RemoveAt(i);
+                    i--;
+                }
+            }
+
+            return list.ToArray();
         }
 
         // https://leetcode.com/problems/merge-triplets-to-form-target-triplet/
