@@ -36,6 +36,44 @@ namespace ConsoleApp1
             Console.WriteLine(app.LengthOfLIS([-2,-1]));
         }
 
+        // https://leetcode.com/problems/palindromic-substrings/description/
+        public int CountSubstrings(string s)
+        {
+            int[] dp = new int[s.Length];
+            dp[0] = 1;
+
+            for (int i = 1; i < s.Length; i++)
+            {
+                dp[i] = dp[i - 1] + pals(s, i);
+            }
+
+            return dp[dp.Length - 1];
+        }
+
+        public int pals(string s, int end)
+        {
+            int count = 1;
+            for (int i = end - 1; i >= 0; i--)
+            {
+                if (s[i] == s[end])
+                {
+                    bool isPal = true;
+                    for (int j = i, k = end; j < k; j++, k--)
+                    {
+                        if (s[j] != s[k])
+                        {
+                            isPal = false;
+                            break;
+                        }
+                    }
+
+                    if (isPal) count++;
+                }
+            }
+
+            return count;
+        }
+
         // https://leetcode.com/problems/longest-increasing-subsequence/
         public int LengthOfLIS(int[] nums)
         {
