@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace ConsoleApp1
 {
@@ -83,6 +84,70 @@ namespace ConsoleApp1
                 return BinarySearch(list, timestamp, mid + 1, end);
             }
             return BinarySearch(list, timestamp, start, mid - 1);
+        }
+    }
+
+    // https://leetcode.com/problems/detect-squares/
+    public class DetectSquares
+    {
+        Dictionary<int, List<int[]>> mapX;
+        Dictionary<int, List<int[]>> mapY;
+        Dictionary<(int x, int y), int> map;
+
+        public DetectSquares()
+        {
+            mapX = new();
+            mapY = new();
+            map = new();
+        }
+
+        public void Add(int[] point)
+        {
+            if (!mapX.ContainsKey(point[0])) mapX.Add(point[0], new List<int[]> { point });
+            else mapX[point[0]].Add(point);
+
+            if (!mapY.ContainsKey(point[1])) mapY.Add(point[1], new List<int[]> { point });
+            else mapY[point[1]].Add(point);
+
+            if (!map.ContainsKey((point[0], point[1]))) map.Add((point[0], point[1]), 1);
+            else map[(point[0], point[1])]++;
+        }
+
+        public int Count(int[] point)
+        {
+            if (!mapX.ContainsKey(point[0]) || !mapY.ContainsKey(point[1])) return 0;
+            int count = 0;
+            var processed = new HashSet<(int, int)>();
+
+            // check along x-axis
+            // Console.WriteLine(mapY[point[1]].Count);
+            foreach (var p in mapY[point[1]])
+            {
+                if (p[0] == point[0]) continue;
+                if (!processed.Add((p[0], p[1]))) continue;
+                processed.Add((p[0], p[1]));
+
+                int diff = Math.Abs(point[0] - p[0]);
+                int c = 0;
+
+                // Check UP
+                var p1 = (p[0], p[1] + diff);
+                var p2 = (point[0], point[1] + diff);
+                if (map.ContainsKey(p1) && map.ContainsKey(p2))
+                {
+                    count += map[(p[0], p[1])] * map[p1] * map[p2];
+                }
+
+                // Check DOWN
+                p1 = (p[0], p[1] - diff);
+                p2 = (point[0], point[1] - diff);
+                if (map.ContainsKey(p1) && map.ContainsKey(p2))
+                {
+                    count += map[(p[0], p[1])] * map[p1] * map[p2];
+                }
+            }
+
+            return count;
         }
     }
 }
