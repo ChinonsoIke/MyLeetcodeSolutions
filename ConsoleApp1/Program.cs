@@ -33,7 +33,77 @@ namespace ConsoleApp1
 
             //var tree = app.BuildTree2(new int?[] { 1, 2, 3, 4, 5, 6 });
             //app.dfs2(tree, 0);
-            Console.WriteLine(app.LengthOfLIS([-2,-1]));
+            Console.WriteLine(app.LongestConsecutive([0,1,1,2]));
+        }
+
+        // https://leetcode.com/problems/longest-consecutive-sequence/
+        public int LongestConsecutive(int[] nums)
+        {
+            if (nums.Length == 0) return 0;
+
+            int max = 0, start = 0, end = 1;
+            Array.Sort(nums);
+
+            int count = 1;
+            while (end < nums.Length)
+            {
+                if (nums[end] == nums[end - 1])
+                {
+                    end++;
+                    continue;
+                }
+                else if (nums[end] - nums[end - 1] != 1)
+                {
+                    start = end;
+                    end = end + 1;
+                    max = Math.Max(max, count);
+                    count = 1;
+                }
+                else
+                {
+                    end++;
+                    count++;
+                }
+            }
+
+            max = Math.Max(max, count);
+
+            return max;
+        }
+
+        public IList<int> SpiralOrder(int[][] matrix)
+        {
+            int[][] dirs = [[0, 1], [1, 0], [0, -1], [-1, 0]]; // right, down, left, up
+            var list = new List<int>();
+
+            dfs(matrix, [0, 0], 0, dirs, list);
+
+            return list;
+        }
+
+        public void dfs(int[][] matrix, int[] node, int cur, int[][] dirs, List<int> list)
+        {
+            list.Add(matrix[node[0]][node[1]]);
+
+            int y = node[0] + dirs[cur][0], x = node[1] + dirs[cur][1];
+
+            if (y < 0 || y >= matrix.Length || x < 0 || x >= matrix[0].Length)
+            {
+                for (int i = cur + 1; i < dirs.Length; i++)
+                {
+                    if (i == cur) break;
+                    y = node[0] + dirs[cur][0]; x = node[1] + dirs[cur][1];
+
+                    if (y < 0 || y >= matrix.Length || x < 0 || x >= matrix[0].Length)
+                    {
+                        if (i == 3) i = -1;
+                        continue;
+                    }
+                    dfs(matrix, [y, x], i, dirs, list);
+                    break;
+                }
+            }
+            else dfs(matrix, [y, x], cur, dirs, list);
         }
 
         // https://leetcode.com/problems/palindromic-substrings/description/
