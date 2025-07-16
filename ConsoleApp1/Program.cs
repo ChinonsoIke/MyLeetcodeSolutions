@@ -71,6 +71,7 @@ namespace ConsoleApp1
             return max;
         }
 
+        // https://leetcode.com/problems/spiral-matrix/description/
         public IList<int> SpiralOrder(int[][] matrix)
         {
             int[][] dirs = [[0, 1], [1, 0], [0, -1], [-1, 0]]; // right, down, left, up
@@ -84,17 +85,18 @@ namespace ConsoleApp1
         public void dfs(int[][] matrix, int[] node, int cur, int[][] dirs, List<int> list)
         {
             list.Add(matrix[node[0]][node[1]]);
+            matrix[node[0]][node[1]] = 101;
 
             int y = node[0] + dirs[cur][0], x = node[1] + dirs[cur][1];
 
-            if (y < 0 || y >= matrix.Length || x < 0 || x >= matrix[0].Length)
+            if (y < 0 || y >= matrix.Length || x < 0 || x >= matrix[0].Length || matrix[y][x] > 100)
             {
-                for (int i = cur + 1; i < dirs.Length; i++)
+                for (int i = cur + 1 < 4 ? cur + 1 : 0; i < dirs.Length; i++)
                 {
                     if (i == cur) break;
-                    y = node[0] + dirs[cur][0]; x = node[1] + dirs[cur][1];
+                    y = node[0] + dirs[i][0]; x = node[1] + dirs[i][1];
 
-                    if (y < 0 || y >= matrix.Length || x < 0 || x >= matrix[0].Length)
+                    if (y < 0 || y >= matrix.Length || x < 0 || x >= matrix[0].Length || matrix[y][x] > 100)
                     {
                         if (i == 3) i = -1;
                         continue;
