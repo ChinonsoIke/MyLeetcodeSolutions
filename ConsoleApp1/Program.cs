@@ -33,7 +33,153 @@ namespace ConsoleApp1
 
             //var tree = app.BuildTree2(new int?[] { 1, 2, 3, 4, 5, 6 });
             //app.dfs2(tree, 0);
-            Console.WriteLine(app.LongestConsecutive([0,1,1,2]));
+            Console.WriteLine(app.IsValidSudoku([['5','3','.','.','7','.','.','.','.'],
+ ['6','.','.','1','9','5','.','.','.'],
+ ['.','9','8','.','.','.','.','6','.'],
+ ['8','.','.','.','6','.','.','.','3'],
+ ['4','.','.','8','.','3','.','.','1'],
+ ['7','.','.','.','2','.','.','.','6'],
+ ['.','6','.','.','.','.','2','8','.'],
+ ['.','.','.','4','1','9','.','.','5'],
+ ['.','.','.','.','8','.','.','7','9']]
+));
+        }
+
+        // https://leetcode.com/problems/push-dominoes/
+        public string PushDominoes(string dominoes)
+        {
+            var arr = dominoes.ToCharArray();
+            var stack = new Stack<int>();
+            int lastPos = 0;
+
+            for (int i = 0; i < arr.Length; i++)
+            {
+                if (arr[i] == 'R')
+                {
+                    if (stack.Count > 0)
+                    {
+                        int r = stack.Pop();
+                        for (int k = r + 1; k < i; k++)
+                        {
+                            arr[k] = 'R';
+                        }
+                    }
+                    stack.Push(i);
+                }
+                else if (arr[i] == 'L')
+                {
+                    if (stack.Count == 0)
+                    {
+                        for (int j = i - 1; j >= lastPos; j--)
+                        {
+                            arr[j] = 'L';
+                        }
+                    }
+                    else
+                    {
+                        int r = stack.Pop();
+                        for (int j = r + 1, k = i - 1; j < k; j++, k--)
+                        {
+                            arr[j] = 'R';
+                            arr[k] = 'L';
+                        }
+                    }
+                    lastPos = i + 1;
+                }
+            }
+
+            int right = int.MaxValue - 1;
+            while (stack.Count > 0)
+            {
+                right = stack.Pop();
+            }
+            for (int i = right + 1; i < arr.Length; i++)
+            {
+                arr[i] = 'R';
+            }
+
+            return new string(arr);
+        }
+
+        public bool IsValidSudoku(char[][] board)
+        {
+            var dict = new Dictionary<int, HashSet<char>>
+            {
+                {1, new HashSet<char>()},
+                {2, new HashSet<char>()},
+                {3, new HashSet<char>()},
+                {4, new HashSet<char>()},
+                {5, new HashSet<char>()},
+                {6, new HashSet<char>()},
+                {7, new HashSet<char>()},
+                {8, new HashSet<char>()},
+                {9, new HashSet<char>()}
+            };
+
+            for (int i = 0; i < board.Length; i++)
+            {
+                var set1 = new HashSet<char>();
+                var set2 = new HashSet<char>();
+                for (int j = 0; j < board[i].Length; j++)
+                {
+                    //Console.WriteLine((i, j));
+                    //Console.WriteLine((j,i));
+
+                    if (board[i][j] != '.' && !set1.Add(board[i][j])) return false;
+                    if (board[j][i] != '.' && !set2.Add(board[j][i])) return false;
+
+                    if(board[i][j] != '.')
+                    {
+                        switch (i)
+                        {
+                            case <= 2:
+                                switch (j)
+                                {
+                                    case <= 2:
+                                        if (!dict[1].Add(board[i][j])) return false;
+                                        break;
+                                    case <= 5:
+                                        if (!dict[2].Add(board[i][j])) return false;
+                                        break;
+                                    default:
+                                        if (!dict[3].Add(board[i][j])) return false;
+                                        break;
+                                }
+                                break;
+                            case <= 5:
+                                switch (j)
+                                {
+                                    case <= 2:
+                                        if (!dict[4].Add(board[i][j])) return false;
+                                        break;
+                                    case <= 5:
+                                        if (!dict[5].Add(board[i][j])) return false;
+                                        break;
+                                    default:
+                                        if (!dict[6].Add(board[i][j])) return false;
+                                        break;
+                                }
+                                break;
+                            default:
+                                switch (j)
+                                {
+                                    case <= 2:
+                                        if (!dict[7].Add(board[i][j])) return false;
+                                        break;
+                                    case <= 5:
+                                        if (!dict[8].Add(board[i][j])) return false;
+                                        break;
+                                    default:
+                                        if (!dict[9].Add(board[i][j])) return false;
+                                        break;
+                                }
+                                break;
+                        }
+                    }
+                }
+            }
+
+            return true;
         }
 
         // https://leetcode.com/problems/longest-consecutive-sequence/
