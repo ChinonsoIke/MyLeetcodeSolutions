@@ -33,16 +33,225 @@ namespace ConsoleApp1
 
             //var tree = app.BuildTree2(new int?[] { 1, 2, 3, 4, 5, 6 });
             //app.dfs2(tree, 0);
-            Console.WriteLine(app.IsValidSudoku([['5','3','.','.','7','.','.','.','.'],
- ['6','.','.','1','9','5','.','.','.'],
- ['.','9','8','.','.','.','.','6','.'],
- ['8','.','.','.','6','.','.','.','3'],
- ['4','.','.','8','.','3','.','.','1'],
- ['7','.','.','.','2','.','.','.','6'],
- ['.','6','.','.','.','.','2','8','.'],
- ['.','.','.','4','1','9','.','.','5'],
- ['.','.','.','.','8','.','.','7','9']]
-));
+            Console.WriteLine(app.CountWinners([5,4,4]));
+        }
+
+        // https://leetcode.com/problems/combination-sum/
+        public IList<IList<int>> CombinationSum(int[] candidates, int target)
+        {
+            var list = new List<IList<int>>();
+            combine(candidates, target, candidates.Length - 1, list, new List<int>());
+
+            return list;
+        }
+
+        void combine(int[] nums, int target, int n, IList<IList<int>> list, List<int> combs)
+        {
+            if (target == 0)
+            {
+                list.Add(new List<int>(combs));
+                return;
+            }
+            if (n < 0) return;
+
+            if (nums[n] > target)
+            {
+                combine(nums, target, n - 1, list, combs);
+                return;
+            }
+
+            // without
+            combine(nums, target, n - 1, list, combs);
+            // with
+            combs.Add(nums[n]);
+            combine(nums, target - nums[n], n, list, combs);
+            combs.RemoveAt(combs.Count - 1);
+        }
+
+        public int CountWinners(int[] initialRewards)
+        {
+            int max = int.MinValue, maxIndex = -1, n = initialRewards.Length, count = 0;
+
+            for (int i = 0; i < initialRewards.Length; i++)
+            {
+                if(initialRewards[i] > max)
+                {
+                    max = initialRewards[i];
+                    maxIndex = i;
+                }
+            }
+
+            foreach(int i in initialRewards)
+            {
+                if (i + n >= max + n - 1) count++;
+            }
+
+            return count;
+        }
+
+        public int CoinChange2(int[] coins, int amount)
+        {
+            int[][] memo = new int[coins.Length][];
+            for (int i = 0; i < memo.Length; i++)
+            {
+                memo[i] = new int[amount + 1];
+                for (int j = 0; j < memo[i].Length; j++) memo[i][j] = -2;
+            }
+
+            return change(coins, coins.Length - 1, amount, 0, memo);
+        }
+
+        int change(int[] coins, int n, int amount, int count, int[][] memo)
+        {
+            // Console.WriteLine((n, count, amount));
+
+            if (amount == 0)
+            {
+                // memo[n][amount] = count;
+                return count;
+            }
+            if (n == -1)
+            {
+                // memo[n][amount] = -1;
+                return -1;
+            }
+
+            if (memo[n][amount] >= -1 && memo[n][amount] < count) return memo[n][amount];
+
+            if (coins[n] > amount)
+            {
+                memo[n][amount] = change(coins, n - 1, amount, count, memo);
+                return memo[n][amount];
+            }
+            int without = change(coins, n - 1, amount, count, memo), with = change(coins, n, amount - coins[n], count + 1, memo);
+
+            // Console.WriteLine((with, without));
+
+            memo[n][amount] = with >= 0 && without >= 0 ? Math.Min(with, without) : Math.Max(with, without);
+            return memo[n][amount];
+        }
+
+
+        public int CanCompleteCircuit2(int[] gas, int[] cost)
+        {
+            int min = gas[0] - cost[0], max = gas[0] - cost[0], start = 0, start2 = 0, gasLeft = 0;
+
+            for (int i = 0; i < gas.Length; i++)
+            {
+                if (gas[i] - cost[i] <= min)
+                {
+                    min = gas[i] - cost[i];
+                    start = i;
+                }
+
+                if (gas[i] - cost[i] > max)
+                {
+                    max = gas[i] - cost[i];
+                    start2 = i;
+                }
+            }
+
+            start = start >= gas.Length - 1 ? 0 : start + 1;
+            gasLeft = gas[start] - cost[start];
+            int j = start + 1;
+            while (j != start)
+            {
+                if (j >= gas.Length) j = 0;
+                gasLeft += gas[j];
+                gasLeft -= cost[j];
+
+                // int next = j == gas.Length-1 ? 0 : i+1;
+                if (gasLeft < 0)
+                {
+                    // Console.WriteLine((j, gasLeft, start));
+                    break;
+                }
+                j++;
+                if (j >= gas.Length) j = 0;
+            }
+            if (j == start) return start;
+
+            gasLeft = gas[start2] - cost[start];
+            j = start2 + 1;
+            while (j != start2)
+            {
+                if (j >= gas.Length) j = 0;
+                gasLeft += gas[j];
+                gasLeft -= cost[j];
+
+                // int next = j == gas.Length-1 ? 0 : i+1;
+                if (gasLeft < 0)
+                {
+                    // Console.WriteLine((j, gasLeft, start2));
+                    return -1;
+                }
+                j++;
+                if (j >= gas.Length) j = 0;
+            }
+
+            return start2;
+        }
+
+        // https://leetcode.com/problems/surrounded-regions/
+        public void Solve(char[][] board)
+        {
+            int n = board.Length, m = board[0].Length;
+            int[][] dirs = [[-1, 0], [0, 1], [1, 0], [0, -1]]; // up, right, down, left
+            bool[][] visited = new bool[n][];
+
+            for (int i = 0; i < n; i++)
+            {
+                visited[i] = new bool[m];
+            }
+
+            // check edges
+            for (int i = 0, j = 0; j < m; j++)
+            {
+                if (board[i][j] == 'O' && !visited[i][j]) dfs(board, i, j, n, m, dirs, visited);
+            }
+            for (int i = n - 1, j = 0; j < m; j++)
+            {
+                if (board[i][j] == 'O' && !visited[i][j]) dfs(board, i, j, n, m, dirs, visited);
+            }
+            for (int i = 0, j = 0; j < n; j++)
+            {
+                if (board[j][i] == 'O' && !visited[j][i]) dfs(board, j, i, n, m, dirs, visited);
+            }
+            for (int i = m - 1, j = 0; j < n; j++)
+            {
+                if (board[j][i] == 'O' && !visited[j][i]) dfs(board, j, i, n, m, dirs, visited);
+            }
+
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < m; j++)
+                {
+                    if (!visited[i][j])
+                    {
+                        board[i][j] = 'X';
+                    }
+                }
+            }
+        }
+
+        public void dfs(char[][] board, int i, int j, int n, int m, int[][] dirs, bool[][] visited)
+        {
+            visited[i][j] = true;
+
+            foreach (var dir in dirs)
+            {
+                int y = i + dir[0], x = j + dir[1];
+
+                if (y < 0 || y >= n || x < 0 || x >= m)
+                {
+                    continue;
+                }
+
+                if (board[y][x] == 'O' && !visited[y][x])
+                {
+                    dfs(board, y, x, n, m, dirs, visited);
+                }
+            }
         }
 
         // https://leetcode.com/problems/push-dominoes/
