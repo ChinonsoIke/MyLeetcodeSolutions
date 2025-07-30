@@ -150,4 +150,99 @@ namespace ConsoleApp1
             return count;
         }
     }
+
+    public class WordDictionary
+    {
+        public TrieNode root;
+
+        public WordDictionary()
+        {
+            root = new TrieNode();
+        }
+
+        public void AddWord(string word)
+        {
+            var cur = root;
+            foreach (char c in word)
+            {
+                if (cur.nodes[c - 'a'] == null)
+                {
+                    cur.nodes[c - 'a'] = new TrieNode();
+                }
+                cur = cur.nodes[c - 'a'];
+            }
+
+            cur.isWordEnd = true;
+        }
+
+        public bool Search(string word)
+        {
+            return search(word, 0, root);
+        }
+
+        bool search(string word, int n, TrieNode cur)
+        {
+            if (n > word.Length) return true;
+            for (int i = n; i < word.Length; i++)
+            {
+                if (word[i] == '.')
+                {
+                    for (int j = 0; j < cur.nodes.Length; j++)
+                    {
+                        if (cur.nodes[j] == null) continue;
+                        bool res = search(word, i + 1, cur.nodes[j]);
+                        if (res) return true;
+                    }
+                    return false;
+                }
+                else if (cur.nodes[word[i] - 'a'] == null) return false;
+                else cur = cur.nodes[word[i] - 'a'];
+            }
+
+            return cur.isWordEnd;
+        }
+    }
+
+    public class Trie
+    {
+        public TrieNode root;
+
+        public Trie()
+        {
+            root = new TrieNode();
+        }
+
+        public void Insert(string word)
+        {
+            var cur = root;
+            foreach (char c in word)
+            {
+                if (cur.nodes[c - 'a'] == null)
+                {
+                    cur.nodes[c - 'a'] = new TrieNode();
+                }
+                cur = cur.nodes[c - 'a'];
+            }
+
+            cur.isWordEnd = true;
+        }
+
+        public bool StartsWith(string prefix)
+        {
+            var cur = root;
+            foreach (char c in prefix)
+            {
+                if (cur.nodes[c - 'a'] == null) return false;
+                cur = cur.nodes[c - 'a'];
+            }
+
+            return true;
+        }
+    }
+
+    public class TrieNode
+    {
+        public TrieNode[] nodes = new TrieNode[26];
+        public bool isWordEnd;
+    }
 }

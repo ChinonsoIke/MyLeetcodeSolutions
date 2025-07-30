@@ -33,7 +33,103 @@ namespace ConsoleApp1
 
             //var tree = app.BuildTree2(new int?[] { 1, 2, 3, 4, 5, 6 });
             //app.dfs2(tree, 0);
-            Console.WriteLine(app.CountWinners([5,4,4]));
+
+            bool[][] visited = new bool[10][];
+            bool[,] v = new bool[10,10];
+
+            Console.WriteLine(app.FindWords([['o', 'a', 'b', 'n'], ['o', 't', 'a', 'e'], ['a', 'h', 'k', 'r'], ['a', 'f', 'l', 'v']]
+, ["oa", "oaa"]));
+        }
+
+        // https://leetcode.com/problems/swim-in-rising-water/
+        public int SwimInWater(int[][] grid)
+        {
+            int n = grid.Length;
+            bool[,] visited = new bool[n, n];
+            int[,] distances = new int[n, n];
+            int[][] dirs = [[-1, 0], [0, 1], [1, 0], [0, -1]];
+
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    distances[i, j] = int.MaxValue;
+                }
+            }
+            distances[0, 0] = grid[0][0];
+
+            var pq = new PriorityQueue<(int i, int j), int>();
+            pq.Enqueue((0, 0), distances[0, 0]);
+
+            while (pq.Count > 0)
+            {
+                var cur = pq.Dequeue();
+                if (visited[cur.i, cur.j]) continue;
+                visited[cur.i, cur.j] = true;
+                if (cur.i == n - 1 && cur.j == n - 1) return distances[n - 1, n - 1];
+
+                foreach (var dir in dirs)
+                {
+                    int x = cur.i + dir[0], y = cur.j + dir[1];
+                    if (x < 0 || y < 0 || x >= n || y >= n) continue;
+
+                    int dist = distances[cur.i, cur.j] > grid[x][y] ? distances[cur.i, cur.j] : grid[x][y];
+                    if (dist < distances[x, y])
+                    {
+                        distances[x, y] = dist;
+                        pq.Enqueue((x, y), dist);
+                    }
+                }
+            }
+
+            return distances[n - 1, n - 1];
+        }
+
+        public IList<string> FindWords(char[][] board, string[] words)
+        {
+            var trie = new Trie();
+            foreach (var word in words) trie.Insert(word);
+            int[][] dirs = [[-1, 0], [0, 1], [1, 0], [0, -1]];
+
+            var list = new List<string>();
+            int m = board.Length, n = board[0].Length;
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    if (trie.root.nodes[board[i][j] - 'a'] != null)
+                    {
+                        dfs(board, i, j, m, n, dirs, trie.root.nodes[board[i][j] - 'a'], list, new List<char> { board[i][j] });
+                    }
+                }
+            }
+
+            return list;
+        }
+
+        void dfs(char[][] board, int i, int j, int m, int n, int[][] dirs, TrieNode cur, List<string> res, List<char> candidates)
+        {
+            if (cur.isWordEnd)
+            {
+                res.Add(new string(candidates.ToArray()));
+            }
+
+            foreach (int[] dir in dirs)
+            {
+                int x = i + dir[0], y = j + dir[1];
+                if (x < 0 || x >= m || y < 0 || y >= n) continue;
+                if (board[x][y] == '-') continue;
+
+                if (cur.nodes[board[x][y] - 'a'] != null)
+                {
+                    char temp = board[x][y];
+                    candidates.Add(temp);
+                    board[x][y] = '-';
+                    dfs(board, x, y, m, n, dirs, cur.nodes[temp - 'a'], res, candidates);
+                    board[x][y] = temp;
+                    candidates.RemoveAt(candidates.Count - 1);
+                }
+            }
         }
 
         // https://leetcode.com/problems/combination-sum/
