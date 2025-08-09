@@ -1,4 +1,5 @@
 ﻿using Grpc.Net.Client;
+using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,30 +17,335 @@ namespace ConsoleApp1
         int max = int.MinValue;
         List<(TreeNode, int)> list = new List<(TreeNode, int)>();
 
+        HubConnection _connection = new HubConnectionBuilder()
+            .WithUrl("https://localhost:7156/hub/chat")
+            .Build();
+
         static async Task Main(string[] args)
         {
             var app = new Program();
-            //TreeNode tree1 = app.BuildTree([1, 2, 2, 3, 3, null, null, 4, 4]);
-            //int a = 1011_0111, b = ~a;
-            //var cache = new LRUCache(2);
-
-            //cache.Put(2, 1);             // cache = {2=1}
-            //cache.Put(1, 1);             // cache = {2=1, 1=1}
-            //cache.Put(2, 3);             // update 2 → {1=1, 2=3}
-            //cache.Put(4, 1);             // evict 1 → {2=3, 4=1}
-
-            //Console.WriteLine(cache.Get(1)); // Output: -1 (not found)
-            //Console.WriteLine(cache.Get(2)); // Output: 3
-
-            //var tree = app.BuildTree2(new int?[] { 1, 2, 3, 4, 5, 6 });
-            //app.dfs2(tree, 0);
+            //await app.connect();
+            
 
             bool[][] visited = new bool[10][];
             bool[,] v = new bool[10,10];
 
-            Console.WriteLine(app.FindWords([['o', 'a', 'b', 'n'], ['o', 't', 'a', 'e'], ['a', 'h', 'k', 'r'], ['a', 'f', 'l', 'v']]
-, ["oa", "oaa"]));
+            Console.WriteLine(app.MinWindow("ADOBECODEBANC", "ABC"));
         }
+
+        // https://leetcode.com/problems/find-median-from-data-stream/
+        public class MedianFinder
+        {
+            int count = 0;
+            PriorityQueue<int, int> pq1;
+            PriorityQueue<int, int> pq2;
+
+            public MedianFinder()
+            {
+                pq1 = new(Comparer<int>.Create((x, y) => y.CompareTo(x)));
+                pq2 = new();
+            }
+
+            public void AddNum(int num)
+            {
+                count++;
+                pq1.Enqueue(num, num);
+                while (pq1.Count - pq2.Count > 1)
+                {
+                    int n = pq1.Dequeue();
+                    pq2.Enqueue(n, n);
+                }
+
+                if (pq1.Count > 0 && pq2.Count > 0 && pq1.Peek() > pq2.Peek())
+                {
+                    int n = pq1.Dequeue();
+                    pq2.Enqueue(n, n);
+                }
+
+                while (pq2.Count - pq1.Count > 1)
+                {
+                    int n = pq2.Dequeue();
+                    pq1.Enqueue(n, n);
+                }
+            }
+
+            public double FindMedian()
+            {
+                if (count % 2 > 0)
+                {
+                    if (count / 2 >= pq1.Count) return pq2.Peek();
+                    return pq1.Peek();
+                }
+                return (double)(pq1.Peek() + pq2.Peek()) / 2;
+            }
+        }
+
+        public string MinWindow(string s, string t)
+        {
+            int[] sArr = new int[58], tArr = new int[58];
+            int start = 0, end = 0, search = -1;
+            StringBuilder sb = new();
+            string min = "";
+            bool found = false;
+
+            foreach (char c in t)
+            {
+                tArr[c - 'A']++;
+            }
+
+            for (int i = 0; i < s.Length; i++)
+            {
+                if (tArr[s[i] - 'A'] > 0)
+                {
+                    start = end = i;
+                    break;
+                }
+            }
+
+            while (end < s.Length && start < s.Length)
+            {
+                if (!found)
+                {
+                    sArr[s[end] - 'A']++;
+                    sb.Append(s[end]);
+                    if (contains(sArr, tArr))
+                    {
+                        found = true;
+                        min = sb.ToString();
+                        continue;
+                    }
+
+                    end++;
+                }
+                else
+                {
+                    if (search == -1)
+                    {
+                        sArr[s[start] - 'A']--;
+                        sb.Remove(0, 1);
+                        if (tArr[s[start] - 'A'] > sArr[s[start] - 'A'])
+                        {
+                            search = s[start] - 'A';
+                        }
+                        else min = sb.Length < min.Length ? sb.ToString() : min;
+                        start++;
+                    }
+                    else
+                    {
+                        end++;
+                        if (end < s.Length)
+                        {
+                            sb.Append(s[end]);
+                            sArr[s[end] - 'A']++;
+                            if (s[end] - 'A' == search)
+                            {
+                                search = -1;
+                                min = sb.Length < min.Length ? sb.ToString() : min;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return min;
+        }
+
+        public bool contains(int[] sArr, int[] tArr)
+        {
+            for (int i = 0; i < 58; i++)
+            {
+                if (sArr[i] < tArr[i])
+                    return false;
+            }
+            return true;
+        }
+
+        public int Trap(int[] height)
+        {
+            int sum = 0, i = 0, end = 0;
+
+            while (i < height.Length)
+            {
+                int max = int.MinValue;
+
+                for (int k = i + 1; k < height.Length; k++)
+                {
+                    if (height[k] >= height[i])
+                    {
+                        end = k;
+                        max = height[k];
+                        break;
+                    }
+                    if (height[k] > max)
+                    {
+                        max = height[k];
+                        end = k;
+                    }
+                }
+
+                for (int k = i + 1; k < end; k++)
+                {
+                    sum += max - height[k];
+                }
+
+                i = end > i ? end : i + 1;
+            }
+
+            return sum;
+        }
+
+        public async Task connect()
+        {
+            _connection.On<object>("SendMessage", (message) =>
+            {
+                Console.WriteLine(message);
+            });
+
+            try
+            {
+                await _connection.StartAsync();
+                Console.WriteLine("Connection started");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+
+        public IList<string> FindItinerary(List<List<string>> tickets)
+        {
+            /*
+                jfk: [muc]
+                muc: [lhr]
+                sfo: [sjc]
+                lhr: [sfo]
+
+                -----
+
+                jfk: [sfo, atl]
+                sfo: [atl]
+                atl: [jfk, sfo]
+
+                idea -> build adj list then do dfs
+            */
+
+            var adjList = new Dictionary<string, List<string>>();
+            var list = new List<string>();
+
+            foreach (var ticket in tickets)
+            {
+                if (!adjList.ContainsKey(ticket[0])) adjList[ticket[0]] = new List<string>();
+                adjList[ticket[0]].Add(ticket[1]);
+            }
+
+            foreach (var node in adjList)
+            {
+                adjList[node.Key].Sort();
+            }
+
+            dfs(adjList, "JFK", list);
+            return list;
+        }
+
+        public bool dfsCheck(Dictionary<string, List<string>> adjList, string root, string search)
+        {
+            if (root == search) return true;
+
+            for(int i=0; i < adjList[root].Count; i++)
+            {
+                //if (dfsCheck(adjList, node, search)) return true;
+            }
+
+            return false;
+        }
+
+        public void dfs(Dictionary<string, List<string>> adjList, string root, List<string> list)
+        {
+            list.Add(root);
+
+            while (adjList.ContainsKey(root) && adjList[root].Count > 0)
+            {
+                if (adjList[root].Count > 1)
+                {
+                    int i = 0;
+                    while (!dfsCheck(adjList, adjList[root][i], root))
+                    {
+                        i++;
+                    }
+                    var temp = adjList[root][i];
+                    adjList[root].RemoveAt(i);
+
+                    dfs(adjList, temp, list);
+                }
+                else
+                {
+                    var temp = adjList[root][0];
+                    adjList[root].RemoveAt(0);
+
+                    dfs(adjList, temp, list);
+                }
+            }
+        }
+
+        /*public IList<string> FindItinerary(List<List<string>> tickets)
+        {
+            /*
+                jfk: [muc]
+                muc: [lhr]
+                sfo: [sjc]
+                lhr: [sfo]
+
+                -----
+
+                jfk: [sfo, atl]
+                sfo: [atl]
+                atl: [jfk, sfo]
+
+                idea -> build adj list then do dfs
+            *
+
+            var adjList = new Dictionary<string, PriorityQueue<string, string>>();
+            var list = new List<string>();
+
+            foreach (var ticket in tickets)
+            {
+                if (!adjList.ContainsKey(ticket[0])) adjList[ticket[0]] = new PriorityQueue<string, string>();
+                adjList[ticket[0]].Enqueue(ticket[1], ticket[1]);
+            }
+
+            dfs(adjList, new Stack<string>(), "JFK", list);
+            return list;
+        }
+
+        public void dfs(Dictionary<string, PriorityQueue<string, string>> adjList, Stack<string> stack, string root, List<string> list)
+        {
+            list.Add(root);
+            if (stack.Count > 0 && root == stack.Peek())
+            {
+                stack.Pop();
+            }
+
+            if (adjList.ContainsKey(root) && adjList[root].Count > 1)
+            {
+                stack.Push(root);
+            }
+
+            while (adjList.ContainsKey(root) && adjList[root].Count > 0)
+            {
+                var cur = adjList[root].Dequeue();
+                var nodes = new List<string>();
+
+                dfs(adjList, stack, cur, list);
+                while (stack.Count > 0 && stack.Peek() == root && adjList[root].Count > 0)
+                {
+                    nodes.Add(cur);
+                    cur = adjList[root].Dequeue();
+                    dfs(adjList, stack, cur, list);
+                }
+
+                foreach (var node in nodes) adjList[root].Enqueue(node, node);
+            }
+        }*/
 
         // https://leetcode.com/problems/swim-in-rising-water/
         public int SwimInWater(int[][] grid)
